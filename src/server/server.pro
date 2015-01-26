@@ -70,7 +70,7 @@ SOURCES += peer.cpp \
     ofonoconstants.cpp \
     ntpcontroller.cpp
 
-SOURCES += credentials.cpp aegis.cpp
+SOURCES += credentials.cpp
 HEADERS += credentials.h
 
 SOURCES += olson.cpp tz.cpp
@@ -127,7 +127,7 @@ dbusconf.path  = $$(DESTDIR)/etc/dbus-1/system.d
 systemd.path = $$(DESTDIR)/usr/lib/systemd/user
 oneshot.path = $$(DESTDIR)/usr/lib/oneshot.d
 
-INSTALLS += target xml backupconf backupscripts cud rfs aegishelper aegisfs timedrc dbusconf systemd oneshot
+INSTALLS += target xml backupconf backupscripts cud rfs timedrc dbusconf systemd oneshot
 
 CONFIG(MEEGO) \
 {
