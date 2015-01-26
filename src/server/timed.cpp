@@ -127,9 +127,6 @@ Timed::Timed(int ac, char **av) :
   init_read_settings() ;
   log_debug() ;
 
-  init_create_event_machine() ;
-  log_debug() ;
-
   init_device_mode() ;
   log_debug() ;
 
@@ -147,9 +144,6 @@ Timed::Timed(int ac, char **av) :
   init_first_boot_hwclock_time_adjustment_check();
   log_debug() ;
 
-  init_load_events() ;
-  log_debug() ;
-
   init_ntp();
   log_debug();
 
@@ -160,11 +154,6 @@ Timed::Timed(int ac, char **av) :
   log_debug() ;
 
   init_dst_checker() ;
-
-  log_debug("starting event mahine") ;
-
-  init_start_event_machine() ;
-  log_debug() ;
 
   log_debug("applying time zone settings") ;
 
@@ -384,9 +373,7 @@ void Timed::init_configuration()
   if (!QDir(data_path).exists())
     QDir().mkpath(data_path);
 
-  std::string events_file = c->get("events_file")->str();
   std::string settings_file = c->get("settings_file")->str();
-  events_path = data_path + QDir::separator() + QString::fromStdString(events_file);
   settings_path = data_path + QDir::separator() + QString::fromStdString(settings_file);
 
   threshold_period_long = c->get("queue_threshold_long")->value() ;
@@ -459,34 +446,6 @@ void Timed::init_read_settings()
   delete tree ;
 }
 
-void Timed::init_create_event_machine()
-{
-  am = new machine_t(this) ;
-  log_debug("am=new machine done") ;
-  q_pause = NULL ;
-
-  // The following call is commented out: device mode will be known later
-#if 0
-  am->device_mode_detected(not act_dead_mode) ; // TODO: avoid "not" here
-#endif
-
-  short_save_threshold_timer = new simple_timer(threshold_period_short) ;
-  long_save_threshold_timer = new simple_timer(threshold_period_long) ;
-  QObject::connect(short_save_threshold_timer, SIGNAL(timeout()), this, SLOT(queue_threshold_timeout())) ;
-  QObject::connect(long_save_threshold_timer, SIGNAL(timeout()), this, SLOT(queue_threshold_timeout())) ;
-
-  QObject::connect(am, SIGNAL(child_created(unsigned,int)), this, SLOT(register_child(unsigned,int))) ;
-  clear_invokation_flag() ;
-
-  QObject::connect(am, SIGNAL(queue_to_be_saved()), this, SLOT(event_queue_changed())) ;
-
-  // Forward signal from am to DBUS via com_nokia_time DBUS adaptor
-  QObject::connect(am, SIGNAL(next_bootup_event(int,int)), this, SIGNAL(next_bootup_event(int,int)));
-
-  QObject::connect(am, SIGNAL(alarm_present(bool)), this, SLOT(set_alarm_present(bool)));
-  QObject::connect(am, SIGNAL(alarm_trigger(QMap<QString,QVariant>)),
-                   this, SLOT(set_alarm_trigger(QMap<QString,QVariant>)));
-}
 
 void Timed::init_context_objects()
 {
@@ -540,31 +499,6 @@ void Timed::init_main_interface_dbus_name()
   }
 }
 
-void Timed::init_load_events()
-{
-  event_storage = new iodata::storage ;
-  event_storage->set_primary_path(events_path.toStdString()) ;
-  event_storage->set_secondary_path(events_path.toStdString()+".bak") ;
-  event_storage->set_validator(events_data_validator(), "event_queue_t") ;
-
-  iodata::record *events = event_storage->load() ;
-
-  log_assert(events) ;
-
-  am->load(events) ;
-
-  delete events ;
-}
-
-void Timed::init_start_event_machine()
-{
-  if(not settings_storage->fix_files(false))
-    log_critical("can't fix the primary settings file") ;
-  if(not event_storage->fix_files(false))
-    log_critical("can't fix the primary event queue file") ;
-  am->process_transition_queue() ;
-  am->start() ;
-}
 
 #if OFONO
 void Timed::init_cellular_services()
@@ -619,14 +553,9 @@ void Timed::init_apply_tz_settings()
 
 Timed::~Timed()
 {
-  stop_machine() ;
   stop_context() ;
   stop_dbus() ;
   stop_stuff() ;
-}
-void Timed::stop_machine()
-{
-  delete am ;
 }
 void Timed::stop_context()
 {
@@ -652,8 +581,6 @@ void Timed::stop_stuff()
   log_debug() ;
   // delete ses_iface ;
   log_debug() ;
-  delete event_storage ;
-  log_debug() ;
   delete settings_storage ;
   log_debug() ;
   delete short_save_threshold_timer ;
@@ -669,86 +596,6 @@ void Timed::stop_stuff()
 }
 
 
-// Move the stuff below to machine:: class
-
-cookie_t Timed::add_event(cookie_t remove, const Maemo::Timed::event_io_t &x, const QDBusMessage &message)
-{
-  if(remove.is_valid() && am->find_event(remove)==NULL)
-  {
-    log_error("[%d]: cookie not found, event can't be replaced", remove.value()) ;
-    return cookie_t() ;
-  }
-
-  cookie_t c = am->add_event(&x, true, NULL, &message) ; // message is given, but no creds
-  log_debug() ;
-  QMap<QString,QString>::const_iterator test = x.attr.txt.find("TEST") ;
-  log_debug() ;
-  if(test!=x.attr.txt.end())
-    log_debug("TEST event: '%s', cookie=%d", test.value().toStdString().c_str(), c.value()) ;
-  log_debug() ;
-  if(c.is_valid() && remove.is_valid() && !am->cancel_by_cookie(remove))
-    log_critical("[%d]: failed to remove event", remove.value()) ;
-  return c ;
-}
-
-void Timed::add_events(const Maemo::Timed::event_list_io_t &events, QList<QVariant> &res, const QDBusMessage &message)
-{
-  if(events.ee.size()==0)
-  {
-    log_info("empty event list to add, ignoring") ;
-    return ;
-  }
-  QMap<QString,QString>::const_iterator test = events.ee[0].attr.txt.find("TEST") ;
-  if(test!=events.ee[0].attr.txt.end())
-    log_debug("TEST list of %d events: '%s'", events.ee.size(), test.value().toStdString().c_str()) ;
-  am->add_events(events, res, message) ;
-}
-
-bool Timed::get_event(cookie_t c, Maemo::Timed::event_io_t &res)
-{
-  if (!c.is_valid())
-  {
-    log_error("[%d]: cookie is invalid", c.value()) ;
-    return false;
-  }
-
-  event_t *event = am->find_event(c) ;
-  if(event == NULL)
-  {
-    log_error("[%d]: cookie is not found", c.value()) ;
-    return false;
-  }
-
-  event_t::to_dbus_iface(*event, res);
-  return true ;
-}
-
-bool Timed::get_events(const QList<uint> &cookies, Maemo::Timed::event_list_io_t &res)
-{
-  if(cookies.size() == 0)
-  {
-    log_error("no any cookie in request argument") ;
-    return false ;
-  }
-
-  res.ee.resize(cookies.count()) ;
-
-  bool status = true ;
-  for(int i = 0; i < cookies.count(); ++i)
-  {
-    log_debug("Searching for cookies[%d]", i) ;
-    status = get_event(cookie_t(cookies[i]), res.ee[i]) ;
-    if(!status)
-      break ;
-  }
-  return status ;
-}
-
-bool Timed::dialog_response(cookie_t c, int value)
-{
-  log_debug("Responded: %d(value=%d)", c.value(), value) ;
-  return am->dialog_response(c, value) ;
-}
 
 void Timed::enable_ntp_time_adjustment(bool enable)
 {
@@ -760,24 +607,6 @@ void Timed::system_owner_changed(const QString &name, const QString &oldowner, c
   log_debug() ;
 }
 
-void Timed::event_queue_changed()
-{
-  bool running = short_save_threshold_timer->isActive() ;
-  if(running)
-    short_save_threshold_timer->stop() ;
-  else
-    long_save_threshold_timer->start() ;
-  short_save_threshold_timer->start() ;
-}
-
-void Timed::queue_threshold_timeout()
-{
-  short_save_threshold_timer->stop() ;
-  long_save_threshold_timer->stop() ;
-  int method_index = this->metaObject()->indexOfMethod("save_event_queue()") ;
-  QMetaMethod method = this->metaObject()->method(method_index) ;
-  method.invoke(this, Qt::QueuedConnection) ;
-}
 
 /*
  * xxx
@@ -785,26 +614,6 @@ void Timed::queue_threshold_timeout()
  * Just like the doctor ordered. :)
  * The chmod is a workaround for backup-framework crash bug.
  */
-
-void Timed::save_event_queue()
-{
-#if 0
-  log_warning("skipping writing queue file") ;
-  return ;
-#endif
-  iodata::record *queue = am->save(false) ; // false = full queue, not backup
-  int res = event_storage->save(queue) ;
-
-  if(res==0) // primary file
-    log_info("event queue written") ;
-  else if(res==1)
-    log_warning("event queue written to secondary file") ;
-  else
-    log_critical("event queue can't be saved") ;
-
-  delete queue ;
-}
-
 void Timed::save_settings()
 {
   iodata::record *tree = settings->save() ;
@@ -832,8 +641,6 @@ void Timed::invoke_signal(const nanotime_t &back)
   QMetaMethod method = this->metaObject()->method(methodIndex);
   method.invoke(this, Qt::QueuedConnection);
   log_assert(q_pause==NULL) ;
-  q_pause = new machine_t::pause_t(am) ;
-  log_debug("new q_pause=%p", q_pause) ;
 }
 
 void Timed::send_time_settings()
@@ -1106,12 +913,6 @@ void Timed::kernel_notification(const nanotime_t &jump_forwards)
   settings->process_kernel_notification(jump_forwards) ;
 }
 
-void Timed::restart_alarm_timer()
-{
-  log_debug();
-  machine_t::pause_t p(am);
-}
-
 void Timed::init_first_boot_hwclock_time_adjustment_check() {
     if (first_boot_date_adjusted)
         return;
@@ -1142,43 +943,4 @@ void Timed::init_first_boot_hwclock_time_adjustment_check() {
     QTextStream out(&file);
     out << QDateTime::currentDateTime().toString() << "\n";
     file.close();
-}
-
-void Timed::set_alarm_present(bool present)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  alarm_present->set(QVariant(present));
-#else
-  alarm_present->setValue(present);
-#endif
-}
-
-void Timed::set_alarm_trigger(const QMap<QString, QVariant> &triggers)
-{
-  Maemo::Timed::Event::Triggers triggerMap;
-  QMapIterator<QString, QVariant> iter(triggers);
-  while (iter.hasNext()) {
-    iter.next();
-    uint cookie = iter.key().toUInt();
-    // The alarm_triggers are reported as nanoseconds since epoch, cf. cluster_queue_t::enter
-    // Convert the time to seconds since epoch, corresponding to QDateTime::toTime_t()
-    quint64 tmp = iter.value().toULongLong() / (quint64) nanotime_t::NANO;
-    quint32 seconds_after_epoch = (quint32) tmp;
-    triggerMap.insert(cookie, seconds_after_epoch);
-  }
-  emit alarm_triggers_changed(triggerMap);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  // statefs supports only boolean and string types, marshall the QMap to a string
-  QString contextProperty = "";
-  QMapIterator<QString, QVariant> i(triggers);
-  while (i.hasNext()) {
-      i.next();
-      if (!contextProperty.isEmpty())
-          contextProperty += ",";
-      contextProperty += QString("%1:%2").arg(i.key()).arg(i.value().toUInt());
-  }
-  alarm_trigger->set(contextProperty);
-#else
-  alarm_trigger->setValue(QVariant::fromValue(triggers));
-#endif
 }

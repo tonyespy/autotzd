@@ -47,10 +47,8 @@
 #include "unix-signal.h"
 #include "onitz.h"
 #include "olson.h"
-#include "machine.h"
 #include "tz.h"
 #include "csd.h"
-#include "event.h"
 #include "peer.h"
 #if HAVE_DSME
 #include "dsme-mode.h"
@@ -81,8 +79,6 @@ public:
   // inline const char *customization_type() { return  "/usr/share/timed/typeinfo/customization.type" ; }
 
   // inline const char *settings_file_type() { return  "/usr/share/timed/typeinfo/settings.type" ; }
-
-  // inline const char *event_queue_type() { return  "/usr/share/timed/typeinfo/queue.type" ; }
 
 private:
 #if 0
@@ -115,28 +111,23 @@ private:
   void init_configuration() ;
   void init_customization() ;
   void init_read_settings() ;
-  void init_create_event_machine() ;
   void init_device_mode() ;
   void init_context_objects() ;
   void init_main_interface_object() ;
   void init_main_interface_dbus_name() ;
-  void init_load_events() ;
   void init_dst_checker() ;
-  void init_start_event_machine() ;
   void init_cellular_services() ;
   void init_ntp();
   void init_apply_tz_settings() ;
   void init_kernel_notification() ;
 
 public:
-  void stop_machine() ;
   void stop_context() ;
   void stop_stuff() ;
   void stop_dbus() ;
 
 public:
 
-  machine_t *am ;
   source_settings *settings ;
   cellular_handler *nitz_object ;
 #if OFONO
@@ -144,16 +135,6 @@ public:
 #endif
   peer_t *peer ;
 
-  void load_events() ;
-  cookie_t add_event(cookie_t remove, const Maemo::Timed::event_io_t &event, const QDBusMessage &message) ;
-  void add_events(const Maemo::Timed::event_list_io_t &events, QList<QVariant> &res, const QDBusMessage &message) ;
-  bool get_event(cookie_t c, Maemo::Timed::event_io_t &res) ;
-  bool get_events(const QList<uint> &cookies, Maemo::Timed::event_list_io_t &res) ;
-  bool dialog_response(cookie_t c, int value) ;
-  bool cancel(cookie_t c) { return am->cancel_by_cookie(c) ; }
-  void cancel_events(const QList<uint> &cookies, QList<uint> &failed) { am->cancel_events(cookies, failed) ;}
-  void alarm_gate(bool value) { return am->alarm_gate(value) ; }
-  int default_snooze(int value) { return settings->default_snooze(value) ; }
   void enable_ntp_time_adjustment(bool enable);
 
   QDBusConnectionInterface *ses_iface ;
@@ -192,7 +173,6 @@ public:
 private:
   Q_INVOKABLE void save_event_queue() ;
 
-  machine_t::pause_t *q_pause ;
   Q_INVOKABLE void send_time_settings() ;
   bool signal_invoked ;
   nanotime_t systime_back ;
@@ -263,10 +243,6 @@ public:
     catch(const iodata::exception &e)
     {
       log_critical("iodata::exception: '%s'", e.info().c_str()) ;
-    }
-    catch(const event_exception &e)
-    {
-      log_critical("event_exception: pid=%d, '%s'", e.pid(), e.what()) ;
     }
     catch(const std::exception &e)
     {
