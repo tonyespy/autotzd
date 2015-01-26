@@ -118,9 +118,7 @@ private:
   void init_create_event_machine() ;
   void init_device_mode() ;
   void init_context_objects() ;
-  void init_backup_object() ;
   void init_main_interface_object() ;
-  void init_backup_dbus_name() ;
   void init_main_interface_dbus_name() ;
   void init_load_events() ;
   void init_dst_checker() ;
@@ -213,7 +211,6 @@ private:
   ContextProvider::Service *context_service ;
 #endif
 
-  QObject *backup_object ;
 public:
   kernel_notification_t *notificator ;
   void invoke_signal(const nanotime_t &) ;
