@@ -41,8 +41,6 @@
 #include <ContextProvider>
 #endif
 
-#include "../voland/interface.h"
-
 #include "queue.type.h"
 #include "config.type.h"
 #include "customization.type.h"
@@ -149,9 +147,6 @@ Timed::Timed(int ac, char **av) :
   log_debug() ;
 
   init_main_interface_dbus_name() ;
-  log_debug() ;
-
-  start_voland_watcher();
   log_debug() ;
 
   init_kernel_notification();
@@ -403,8 +398,6 @@ void Timed::init_configuration()
 
   threshold_period_long = c->get("queue_threshold_long")->value() ;
   threshold_period_short = c->get("queue_threshold_short")->value() ;
-  ping_period = c->get("voland_ping_sleep")->value() ;
-  ping_max_num = c->get("voland_ping_retries")->value() ;
   log_debug("deleting iodata::record *c") ;
   delete c ;
   log_debug("deleting config_storage") ;
@@ -492,64 +485,15 @@ void Timed::init_create_event_machine()
   QObject::connect(am, SIGNAL(child_created(unsigned,int)), this, SLOT(register_child(unsigned,int))) ;
   clear_invokation_flag() ;
 
-  ping = new pinguin_t(ping_period, ping_max_num, this) ;
-  QObject::connect(am, SIGNAL(voland_needed()), ping, SLOT(voland_needed())) ;
-  QObject::connect(this, SIGNAL(voland_registered()), ping, SLOT(voland_registered())) ;
-
   QObject::connect(am, SIGNAL(queue_to_be_saved()), this, SLOT(event_queue_changed())) ;
 
   // Forward signal from am to DBUS via com_nokia_time DBUS adaptor
   QObject::connect(am, SIGNAL(next_bootup_event(int,int)), this, SIGNAL(next_bootup_event(int,int)));
-#if 0
-  QDBusConnectionInterface *bus_ifc = Maemo::Timed::Voland::bus().interface() ;
 
-  voland_watcher = new QDBusServiceWatcher((QString)Maemo::Timed::Voland::service(), Maemo::Timed::Voland::bus()) ;
-  QObject::connect(voland_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)), this, SLOT(system_owner_changed(QString,QString,QString))) ;
-#else
-  voland_watcher = NULL ;
-#endif
-  QObject::connect(this, SIGNAL(voland_registered()), am, SIGNAL(voland_registered())) ;
-  QObject::connect(this, SIGNAL(voland_unregistered()), am, SIGNAL(voland_unregistered())) ;
-
-#if 0
-  bool voland_present = bus_ifc->isServiceRegistered(Maemo::Timed::Voland::service()) ;
-
-  if(voland_present)
-  {
-    log_info("Voland service %s detected", Maemo::Timed::Voland::service()) ;
-    emit voland_registered() ;
-  }
-#endif
   QObject::connect(am, SIGNAL(alarm_present(bool)), this, SLOT(set_alarm_present(bool)));
   QObject::connect(am, SIGNAL(alarm_trigger(QMap<QString,QVariant>)),
                    this, SLOT(set_alarm_trigger(QMap<QString,QVariant>)));
 }
-
-void Timed::stop_voland_watcher()
-{
-  if (voland_watcher)
-    delete voland_watcher ;
-  voland_watcher = NULL ;
-}
-
-void Timed::start_voland_watcher()
-{
-  stop_voland_watcher() ;
-
-  voland_watcher = new QDBusServiceWatcher((QString)Maemo::Timed::Voland::service(),
-                                           QDBusConnection::sessionBus());
-  QObject::connect(voland_watcher, SIGNAL(serviceOwnerChanged(QString,QString,QString)), this, SLOT(system_owner_changed(QString,QString,QString))) ;
-
-  QDBusConnectionInterface *bus_ifc = QDBusConnection::sessionBus().interface();
-  bool voland_present = bus_ifc and bus_ifc->isServiceRegistered(Maemo::Timed::Voland::service()) ;
-
-  if(voland_present)
-  {
-    log_info("Voland service %s detected", Maemo::Timed::Voland::service()) ;
-    emit voland_registered() ;
-  }
-}
-
 
 void Timed::init_context_objects()
 {
@@ -752,8 +696,6 @@ void Timed::stop_stuff()
   log_debug() ;
   // delete ses_iface ;
   log_debug() ;
-  delete voland_watcher ;
-  log_debug() ;
   delete event_storage ;
   log_debug() ;
   delete settings_storage ;
@@ -860,17 +802,6 @@ void Timed::enable_ntp_time_adjustment(bool enable)
 void Timed::system_owner_changed(const QString &name, const QString &oldowner, const QString &newowner)
 {
   log_debug() ;
-  bool name_match = name==Maemo::Timed::Voland::service() ;
-  if(name_match && oldowner.isEmpty() && !newowner.isEmpty())
-    emit voland_registered() ;
-  else if(name_match && !oldowner.isEmpty() && newowner.isEmpty())
-    emit voland_unregistered() ;
-#define __qstr(a) (a.isEmpty()?"<empty>":a.toStdString().c_str())
-  if(name_match)
-    log_info("Service %s owner changed from %s to %s", __qstr(name), __qstr(oldowner), __qstr(newowner)) ;
-  else
-    log_error("expecing notification about '%s' got about '%s'", Maemo::Timed::Voland::service(), name.toStdString().c_str()) ;
-#undef __qstr
 }
 
 void Timed::event_queue_changed()
@@ -1130,7 +1061,6 @@ void Timed::open_epoch()
 void Timed::dsme_mode_is_changing()
 {
   log_notice("mode is changing, freezeng machine") ;
-  // stop_voland_watcher() ;
   am->freeze() ;
 }
 
@@ -1152,11 +1082,6 @@ void Timed::dsme_mode_reported(const string &mode)
     log_warning("MODE: machine remain frozen (mode reported by dsme: '%s')", mode.c_str()) ;
     return ;
   }
-#if 0
-  if (const char *addr = getenv("DBUS_SESSION_BUS_ADDRESS"))
-    connect_to_session_bus(session_bus_address = addr) ;
-  start_voland_watcher() ;
-#endif
 }
 #endif
 
@@ -1175,7 +1100,6 @@ void Timed::device_mode_reached(bool act_dead, const string &new_address)
   }
 #endif
   connect_to_session_bus(session_bus_address = new_address) ;
-  start_voland_watcher() ;
   am->device_mode_detected(not act_dead) ;
   am->unfreeze() ;
 }
@@ -1194,12 +1118,7 @@ void Timed::session_reported(const QString &new_address)
   log_notice("session bus address changed: '%s'", session_bus_address.c_str()) ;
   if (session_bus_address.empty())
   {
-    stop_voland_watcher() ;
     QDBusConnection::disconnectFromBus(session_bus_name.c_str()) ;
-  }
-  else
-  {
-    start_voland_watcher() ;
   }
 #else
   (void)new_address ;

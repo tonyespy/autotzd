@@ -313,7 +313,6 @@ public:
   void enter(event_t *e) ;
   uint32_t cluster_bits() { return EventFlags::Cluster_Dialog ; }
 Q_SIGNALS:
-  void voland_needed() ;
 private:
   Q_OBJECT ;
 } ;
@@ -326,7 +325,6 @@ struct state_dlg_cntr_t : public abstract_concentrating_state_t
   void resolve_names() ;
   virtual ~state_dlg_cntr_t() { }
   uint32_t cluster_bits() { return EventFlags::Cluster_Dialog ; }
-  void request_voland() ;
 public Q_SLOTS:
   void open() ;
   void send_back() ;

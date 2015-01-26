@@ -10,9 +10,9 @@ VERSION = $$(TIMED_VERSION)
 
 INCLUDEPATH += ../h
 
-QMAKE_LIBDIR_FLAGS += -L../lib -L../voland
-equals(QT_MAJOR_VERSION, 4): LIBS += -ltimed -ltimed-voland
-equals(QT_MAJOR_VERSION, 5): LIBS += -ltimed-qt5 -ltimed-voland-qt5
+QMAKE_LIBDIR_FLAGS += -L../lib
+equals(QT_MAJOR_VERSION, 4): LIBS += -ltimed
+equals(QT_MAJOR_VERSION, 5): LIBS += -ltimed-qt5
 
 IODATA_TYPES = queue.type config.type settings.type customization.type tzdata.type
 

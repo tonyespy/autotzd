@@ -134,16 +134,9 @@ machine_t::machine_t(const Timed *daemon) : timed(daemon)
 
   state_armed->open() ;
 
-  QObject::connect(state_dlg_wait, SIGNAL(voland_needed()), this, SIGNAL(voland_needed())) ;
-
   QObject::connect(state_dlg_wait, SIGNAL(closed()), state_dlg_requ, SLOT(open())) ;
   QObject::connect(state_dlg_wait, SIGNAL(closed()), state_dlg_user, SLOT(open())) ;
   QObject::connect(state_dlg_requ, SIGNAL(closed()), state_dlg_wait, SLOT(open())) ;
-
-  QObject::connect(this, SIGNAL(voland_registered()), state_dlg_requ, SLOT(close())) ;
-  QObject::connect(this, SIGNAL(voland_registered()), state_dlg_user, SLOT(close())) ;
-  QObject::connect(this, SIGNAL(voland_unregistered()), state_dlg_wait, SLOT(close())) ;
-  QObject::connect(this, SIGNAL(voland_unregistered()), state_dlg_cntr, SLOT(send_back())) ;
 
   QObject::connect(state_queued, SIGNAL(sleep()), state_dlg_cntr, SLOT(open()), Qt::QueuedConnection) ;
   QObject::connect(state_dlg_wait, SIGNAL(opened()), state_dlg_cntr, SLOT(open()), Qt::QueuedConnection) ;
@@ -916,16 +909,6 @@ void request_watcher_t::call_returned(QDBusPendingCallWatcher *w)
   bool ok = reply.isValid() and reply.value() ;
 
   abstract_io_state_t *next = machine->state_dlg_user ;
-
-  if (ok)
-    log_notice("Voland acknowledge received, moving %d event(s) to DLG_USER", events.size()) ;
-  else
-  {
-    string err = reply.isValid() ? "false returned" : reply.error().message().toStdString() ;
-    log_error("Voland call 'create' failed, message: '%s'", err.c_str()) ;
-    log_notice("moving %d event(s) to DLG_WAIT", events.size()) ;
-    next = machine->state_dlg_wait ;
-  }
 
   for(set<event_t*>::const_iterator it=events.begin(); it!=events.end(); ++it)
     next->go_to(*it) ;

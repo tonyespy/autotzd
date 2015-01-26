@@ -25,10 +25,6 @@
 #include "../lib/nanotime.h"
 #include "../lib/aliases.h"
 
-#include "../voland/reminder.h"
-#include "../voland/interface.h"
-#include "../voland/reminder-pimple.h"
-
 #include "machine.h"
 #include "event.h"
 #include "misc.h"
@@ -722,7 +718,6 @@ state_button_t::state_button_t(machine_t *owner, signed n) : abstract_state_t(bu
 void state_button_t::enter(event_t *e)
 {
   abstract_state_t::enter(e) ;
-  log_notice("Voland responded: cookie=%d, button-value=%d", e->cookie.value(), no) ;
   int snooze_length = 0 ;
 
   if (e->tsz_max)
@@ -805,8 +800,6 @@ void state_aborted_t::enter(event_t *e)
 void state_dlg_wait_t::enter(event_t *e)
 {
   e->flags |= EventFlags::In_Dialog ;
-  if (not is_open)
-    emit voland_needed() ;
   abstract_gate_state_t::enter(e) ;
 }
 
@@ -825,8 +818,6 @@ void state_dlg_cntr_t::resolve_names()
 
 void state_dlg_cntr_t::open()
 {
-  if (not events.empty())
-    request_voland() ;
   abstract_concentrating_state_t::open() ;
 }
 
@@ -838,50 +829,6 @@ void state_dlg_cntr_t::send_back()
     machine->process_transition_queue() ;
 }
 
-void state_dlg_cntr_t::request_voland()
-{
-  if (events.empty())
-    return ; // avoid a memory leak for 'w' below.
-
-  QList<QVariant> reminders ;
-  request_watcher_t *w = new request_watcher_t(machine) ;
-  Maemo::Timed::Voland::Interface ifc(QDBusConnection::sessionBus());
-  for(set<event_t*>::iterator it=events.begin(); it!=events.end(); ++it)
-  {
-    event_t *e = *it ;
-    w->attach(e) ;
-    Maemo::Timed::Voland::reminder_pimple_t *p = new Maemo::Timed::Voland::reminder_pimple_t ;
-    log_debug("was soll ich schon vergessen haben?") ;
-    p->flags = e->flags & EventFlags::Voland_Mask ;
-    log_debug() ;
-    p->cookie = e->cookie.value() ;
-    log_debug() ;
-    map_std_to_q(e->attr.txt, p->attr) ;
-    p->attr.insert("STATE", e->state->name()) ;
-    p->attr.insert("COOKIE", QString("%1").arg(e->cookie.value()));
-    p->attr.insert("timeoutSnoozeCounter", QString("%1").arg(e->tsz_counter));
-    p->attr.insert("maximalTimeoutSnoozeCounter", QString("%1").arg(e->tsz_max));
-    log_debug() ;
-    p->buttons.resize(e->b_attr.size()) ;
-    log_debug() ;
-    for(int i=0; i<p->buttons.size(); ++i)
-      map_std_to_q(e->b_attr[i].txt, p->buttons[i].attr) ;
-    log_debug() ;
-    log_debug() ;
-    Maemo::Timed::Voland::Reminder R(p) ;
-    reminders.push_back(QVariant::fromValue(R)) ;
-#if 0 // GET RID OF THIS PIECE SOON !
-    log_debug() ;
-    Maemo::Timed::Voland::Reminder RR = R ;
-    ifc.open_async(RR); // fire and forget
-    log_debug() ;
-#endif
-    log_debug() ;
-  }
-  log_debug() ;
-  QDBusPendingCall async = ifc.open_async(reminders) ;
-  w->watch(async) ;
-}
 
 void state_dlg_requ_t::enter(event_t *e)
 {
@@ -893,16 +840,10 @@ void state_dlg_requ_t::abort(event_t *e)
   if (e->request_watcher)
     e->request_watcher->detach(e) ;
 
-  Maemo::Timed::Voland::Interface ifc(QDBusConnection::sessionBus());
-  ifc.close_async(e->cookie.value()) ;
-
   abstract_io_state_t::abort(e) ;
 }
 
 void state_dlg_user_t::abort(event_t *e)
 {
-  Maemo::Timed::Voland::Interface ifc(QDBusConnection::sessionBus());
-  ifc.close_async(e->cookie.value()) ;
-
   abstract_io_state_t::abort(e) ;
 }

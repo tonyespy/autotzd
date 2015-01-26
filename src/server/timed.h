@@ -43,7 +43,6 @@
 
 #include "wrappers.h"
 #include "singleshot.h"
-#include "pinguin.h"
 #include "settings.h"
 #include "unix-signal.h"
 #include "onitz.h"
@@ -140,7 +139,6 @@ public:
 public:
 
   machine_t *am ;
-  pinguin_t *ping ;
   source_settings *settings ;
   cellular_handler *nitz_object ;
 #if OFONO
@@ -149,9 +147,6 @@ public:
   peer_t *peer ;
 
   void load_events() ;
-  void check_voland_service() ;
-  void start_voland_watcher() ;
-  void stop_voland_watcher() ;
   cookie_t add_event(cookie_t remove, const Maemo::Timed::event_io_t &event, const QDBusMessage &message) ;
   void add_events(const Maemo::Timed::event_list_io_t &events, QList<QVariant> &res, const QDBusMessage &message) ;
   bool get_event(cookie_t c, Maemo::Timed::event_io_t &res) ;
@@ -172,8 +167,6 @@ public Q_SLOTS:
   void register_child(unsigned cookie, int pid) { children[pid] = cookie ; }
   void session_reported(const QString &address) ;
 Q_SIGNALS:
-  void voland_registered() ;
-  void voland_unregistered() ;
   void settings_changed(const Maemo::Timed::WallClock::Info &, bool system_time) ;
   void next_bootup_event(int next_boot_event, int next_non_boot_event);
   void alarm_triggers_changed(Maemo::Timed::Event::Triggers);
@@ -184,12 +177,10 @@ public:
   int get_default_gmt_offset() { return default_gmt_offset ; }
 
 private:
-  QDBusServiceWatcher *voland_watcher ;
   iodata::storage *event_storage, *settings_storage ;
 
   simple_timer *short_save_threshold_timer, *long_save_threshold_timer ;
   unsigned threshold_period_long, threshold_period_short ;
-  unsigned ping_period, ping_max_num ;
   QString data_path, events_path, settings_path;
   int default_gmt_offset ;
 #if HAVE_DSME

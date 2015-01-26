@@ -96,10 +96,7 @@ struct machine_t : public QObject
   Q_OBJECT ;
 Q_SIGNALS:
   void engine_pause(int dx) ;
-  void voland_registered() ;
-  void voland_unregistered() ;
   void queue_to_be_saved() ;
-  void voland_needed() ;
   void next_bootup_event(int, int);
   void child_created(unsigned, int) ;
   void alarm_present(bool present);
