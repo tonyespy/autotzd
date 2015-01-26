@@ -42,7 +42,6 @@
 #endif
 
 #include "wrappers.h"
-#include "singleshot.h"
 #include "settings.h"
 #include "unix-signal.h"
 #include "onitz.h"
