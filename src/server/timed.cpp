@@ -46,9 +46,6 @@
 #include "customization.type.h"
 #include "settings.type.h"
 
-#if HAVE_DSME
-#include "interfaces.h"
-#endif
 #include "adaptor.h"
 #include "timed.h"
 #include "settings.h"
@@ -115,8 +112,6 @@ Timed::Timed(int ac, char **av) :
   log_debug() ;
 
   // init_act_dead() ;
-  // init_dsme_mode() ;
-  log_debug() ;
 
   init_configuration() ;
   log_debug() ;
@@ -200,135 +195,9 @@ void Timed::init_scratchbox_mode()
 #endif
 }
 
-// * Condition "running in ACT DEAD mode" is detected.
-// * When running on Harmattan device (not scratchbox!):
-//      some sanity checks are performed.
-
-#if F_ACTING_DEAD
-// Ask DSME: are we in ACT_DEAD mode?
-// Returns:
-//          -1: nobody knows (for example: DSME not running)
-//           0: USER mode
-//           1: ACT_DEAD mode
-#if 0
-static int is_act_dead_by_dsme(string &dsme_mode)
-{
-  // QDBusInterface dsme(dsme_service, dsme_req_path, dsme_req_interface, QDBusConnection::systemBus()) ;
-  DsmeReqInterface dsme ;
-
-  if (not dsme.isValid())
-  {
-    log_error("DSME interface isn't valid") ;
-    return -1 ;
-  }
-
-  QDBusReply<QString> res = dsme.get_state_sync() ;
-
-  if (not res.isValid())
-  {
-    log_error("DSME returned invalid answer, last error: '%s'", QDBusConnection::systemBus().lastError().message().toStdString().c_str()) ;
-    return -1 ;
-  }
-
-  dsme_mode = res.value().toStdString() ;
-  log_notice("got a mode string from DSME: '%s'", dsme_mode.c_str()) ;
-
-  if (dsme_mode=="USER")
-    return 0 ;
-  else if (dsme_mode=="ACTDEAD")
-    return 1 ;
-  else
-    return -1 ;
-}
-#endif
-
-// Detecting run mode by /tmp/USER, /tmp/ACT_DEAD, /tmp/STATUS
-// Returns:
-//          -1: nobody knows (files are not in consistent state)
-//           0: USER mode
-//           1: ACT_DEAD mode
-static int is_act_dead_by_status_files()
-{
-  bool tmp_act_dead = access("/tmp/ACT_DEAD", F_OK) == 0 ;
-  bool tmp_user = access("/tmp/USER", F_OK) == 0 ;
-  string tmp_state ;
-  iodata::storage::read_file_to_string("/tmp/STATE", tmp_state) ;
-  bool mode_is_user = tmp_user and not tmp_act_dead and tmp_state == "USER\n" ;
-  bool mode_is_act_dead = not tmp_user and tmp_act_dead and tmp_state == "ACT_DEAD\n" ;
-
-  if (mode_is_user)
-    return 0 ;
-  else if (mode_is_act_dead)
-    return 1 ;
-  else
-  {
-    log_error("inconsistent device mode indication, more info follows") ;
-    log_error("/tmp/USER %s exist", tmp_user ? "does" : "doesn't") ;
-    log_error("/tmp/ACT_DEAD %s exist", tmp_act_dead ? "does" : "doesn't") ;
-    log_error("content of /tmp/STATE: '%s'", tmp_state.c_str()) ;
-    return -1 ;
-  }
-}
-
-// Make two stage detection, return only if successfully detected
-#if 0
-static bool init_act_dead_v2(bool use_status_files)
-{
-  string s_dsme_mode ;
-  int dsme_mode = is_act_dead_by_dsme(s_dsme_mode) ;
-  if (0<=dsme_mode) // got a valid answer: user or act_dead
-    return dsme_mode ;
-
-  if (use_status_files)
-  {
-    int sb_mode = is_act_dead_by_status_files() ;
-    if (0<=sb_mode)
-      return sb_mode ;
-  }
-
-  // oops, we don't know which mode we're running in; let's die
-
-  // how to die? it depends on dsme mode
-
-  log_critical("can't decide in which mode to run (dsme mode: '%s')", s_dsme_mode.c_str()) ;
-
-  if (s_dsme_mode=="SHUTDOWN" or s_dsme_mode=="REBOOT")
-  {
-    log_critical("go to sleep, waiting to be killed, bye...") ;
-    while(true) sleep(239239239) ;
-  }
-
-  log_critical("will be terminated in two seconds, bye...") ;
-
-  sleep(2) ;
-  log_abort("aborting") ;
-}
-#endif
-
-#endif
-
 void Timed::init_device_mode()
 {
   current_mode = "(unknown)" ;
-#if HAVE_DSME
-  dsme_mode_handler = new dsme_mode_t(this);
-  QObject::connect(dsme_mode_handler, SIGNAL(mode_is_changing()), this, SLOT(dsme_mode_is_changing())) ;
-  QObject::connect(dsme_mode_handler, SIGNAL(mode_reported(const string &)), this, SLOT(dsme_mode_reported(const string &))) ;
-#if F_ACTING_DEAD
-  if (scratchbox_mode)
-  {
-    int is_act_dead = is_act_dead_by_status_files() ;
-    bool user_mode = is_act_dead==0, mode_known = is_act_dead==0 or is_act_dead==1 ;
-    if (not mode_known)
-      log_abort("can't detect running mode") ;
-    device_mode_reached(user_mode) ;
-  }
-  else
-#endif
-  {
-    dsme_mode_handler->init_request() ;
-  }
-#endif
   const char *startup_path="/com/nokia/startup/signal", *startup_iface="com.nokia.startup.signal" ;
   const char *desktop_visible_slot = SLOT(harmattan_desktop_visible()) ;
   const char *init_done_slot = SLOT(harmattan_init_done(int)) ;
@@ -820,33 +689,6 @@ void Timed::open_epoch()
 #endif
 }
 
-#if HAVE_DSME
-void Timed::dsme_mode_is_changing()
-{
-  log_notice("mode is changing, freezeng machine") ;
-  am->freeze() ;
-}
-
-void Timed::dsme_mode_reported(const string &mode)
-{
-  log_notice("MODE: reported by dsme '%s'", mode.c_str()) ;
-  if (mode=="USER")
-  {
-    am->device_mode_detected(true) ;
-    am->unfreeze() ;
-  }
-  else if (mode=="ACTDEAD")
-  {
-    am->device_mode_detected(false) ;
-    am->unfreeze() ;
-  }
-  else
-  {
-    log_warning("MODE: machine remain frozen (mode reported by dsme: '%s')", mode.c_str()) ;
-    return ;
-  }
-}
-#endif
 
 #if 0
 void Timed::device_mode_reached(bool act_dead, const string &new_address)
