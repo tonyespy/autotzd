@@ -55,7 +55,6 @@
 #include "notification.h"
 #include "time.h"
 #include "../common/log.h"
-#include "ntpcontroller.h"
 
 #include <string>
 #include <fstream>
@@ -138,9 +137,6 @@ Timed::Timed(int ac, char **av) :
 
   init_first_boot_hwclock_time_adjustment_check();
   log_debug() ;
-
-  init_ntp();
-  log_debug();
 
 #if OFONO
   init_cellular_services() ;
@@ -398,12 +394,6 @@ void Timed::init_cellular_services()
 }
 #endif // OFONO
 
-
-void Timed::init_ntp()
-{
-  ntp_controller = new NtpController(settings->time_nitz, this);
-}
-
 void Timed::init_dst_checker()
 {
   log_debug() ;
@@ -462,13 +452,6 @@ void Timed::stop_stuff()
   log_debug() ;
   cellular_handler::uninitialize() ;
   log_notice("stop_stuff() DONE") ;
-}
-
-
-
-void Timed::enable_ntp_time_adjustment(bool enable)
-{
-    ntp_controller->enableNtpTimeAdjustment(enable);
 }
 
 void Timed::system_owner_changed(const QString &name, const QString &oldowner, const QString &newowner)

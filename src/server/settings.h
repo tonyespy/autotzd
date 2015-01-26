@@ -79,13 +79,6 @@ struct nitz_utc_t : public utc_source_t
   nanotime_t value_at_zero() const ;
 } ;
 
-struct ntp_utc_t : public utc_source_t
-{
-  virtual ~ntp_utc_t() { }
-  const char* name() const { return "ntp_utc" ; }
-  bool available() const { return false ; }
-} ;
-
 struct gps_utc_t : public utc_source_t
 {
   virtual ~gps_utc_t() { }
@@ -195,7 +188,7 @@ struct source_settings : public QObject
   zone_source_t *manual_zone ;
   cellular_zone_t *cellular_zone ;
   offset_source_t *manual_offset, *nitz_offset ;
-  utc_source_t *manual_utc, *nitz_utc, *gps_utc, *ntp_utc ;
+  utc_source_t *manual_utc, *nitz_utc, *gps_utc;
   key_int_t *app_snooze ;
 
   bool time_nitz, local_cellular, auto_dst ;

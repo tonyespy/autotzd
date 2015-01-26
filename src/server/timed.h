@@ -60,8 +60,6 @@ namespace statefs {
 }
 #endif
 
-class NtpController;
-
 struct Timed : public QCoreApplication
 {
 public:
@@ -114,7 +112,6 @@ private:
   void init_main_interface_dbus_name() ;
   void init_dst_checker() ;
   void init_cellular_services() ;
-  void init_ntp();
   void init_apply_tz_settings() ;
   void init_kernel_notification() ;
 
@@ -131,8 +128,6 @@ public:
   csd_t *csd ;
 #endif
   peer_t *peer ;
-
-  void enable_ntp_time_adjustment(bool enable);
 
   QDBusConnectionInterface *ses_iface ;
 
@@ -173,7 +168,6 @@ private:
   QTimer *dst_timer ;
   std::string sent_signature ;
   tz_oracle_t *tz_oracle ;
-  NtpController *ntp_controller;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   statefs::qt::InOutWriter *alarm_present;

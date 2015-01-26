@@ -135,7 +135,6 @@ source_settings::source_settings(Timed *owner) : QObject(owner)
   _creat(manual_utc) ;
   _creat(nitz_utc) ;
   _creat(gps_utc) ;
-  _creat(ntp_utc) ;
   _creat(manual_offset) ;
   _creat(nitz_offset) ;
   _creat(manual_zone) ;
@@ -262,8 +261,6 @@ Maemo::Timed::WallClock::wall_info_pimple_t *source_settings::get_wall_clock_inf
   p->clocks.push_back(nitz_utc->value_at_zero()) ;
   log_assert(Maemo::Timed::WallClock::UtcGps==2) ;
   p->clocks.push_back(gps_utc->value_at_zero()) ;
-  log_assert(Maemo::Timed::WallClock::UtcNtp==3) ;
-  p->clocks.push_back(ntp_utc->value_at_zero()) ;
 
 #define _import(x) static const int x=Maemo::Timed::WallClock::wall_info_pimple_t::x ;
   _import(CL) ;
@@ -622,15 +619,12 @@ bool source_settings::wall_clock_settings(const Maemo::Timed::WallClock::wall_se
         set_system_time(nitz_utc->value_at_zero()) ;
         o->open_epoch() ;
       }
-      o->enable_ntp_time_adjustment(true);
       break ;
     case Op_Set_Time_Manual:
-      o->enable_ntp_time_adjustment(false);
       manual_utc->value = value_at_zero() ;
       time_nitz = false ;
       break ;
     case Op_Set_Time_Manual_Val:
-      o->enable_ntp_time_adjustment(false);
       time_nitz = false ;
       manual_utc->value = p.time_at_zero ;
       set_system_time(p.time_at_zero) ;
