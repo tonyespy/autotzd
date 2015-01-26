@@ -104,9 +104,6 @@ Timed::Timed(int ac, char **av) :
   first_boot_date_adjusted = false;
   log_debug() ;
 
-  init_scratchbox_mode() ;
-  log_debug() ;
-
   init_unix_signal_handler() ;
   log_debug() ;
 
@@ -174,23 +171,6 @@ void Timed::init_dbus_peer_info()
   peer =  new peer_t(true) ;
 }
 
-// * Condition "running inside of scratchbox" is detected
-void Timed::init_scratchbox_mode()
-{
-#if F_SCRATCHBOX
-#if 0
-  const char *path = getenv("PATH") ;
-  scratchbox_mode = path && strstr(path, "scratchbox") ; // XXX: more robust sb detection?
-#else
-  const char *magic_path = "/targets/links/scratchbox.config" ;
-  scratchbox_mode = access(magic_path, F_OK)==0 ;
-#endif
-  log_info("%s" "SCRATCHBOX detected", scratchbox_mode ? "" : "no ") ;
-#else
-  scratchbox_mode = false ;
-#endif
-}
-
 void Timed::init_device_mode()
 {
   current_mode = "(unknown)" ;
@@ -204,18 +184,6 @@ void Timed::init_device_mode()
   if (not res2)
     log_critical("can't connect to 'init_done' signal") ;
 }
-
-#if 0
-void Timed::init_act_dead()
-{
-#if F_ACTING_DEAD
-  act_dead_mode = init_act_dead_v2(scratchbox_mode) ;
-#else
-  act_dead_mode = false ;
-#endif
-  log_notice("running in %s mode", act_dead_mode ? "ACT_DEAD" : "USER") ;
-}
-#endif
 
 // * Reading configuration file
 // * Warning if no exists (which is okey)
@@ -368,11 +336,6 @@ void Timed::init_main_interface_dbus_name()
 #if OFONO
 void Timed::init_cellular_services()
 {
-#if 0
-  nitz_object = cellular_handler::object() ;
-  int nitzrez = QObject::connect(nitz_object, SIGNAL(cellular_data_received(const cellular_info_t &)), this, SLOT(nitz_notification(const cellular_info_t &))) ;
-  log_debug("nitzrez=%d", nitzrez) ;
-#endif
   tzdata::init(tz_by_default) ;
   csd = new csd_t(this) ;
   tz_oracle = new tz_oracle_t ;
@@ -387,10 +350,6 @@ void Timed::init_cellular_services()
   log_assert(res3) ;
   log_assert(res4) ;
 
-#if 0
-  QObject::connect(tz_oracle, SIGNAL(tz_detected(olson *, tz_suggestions_t)), this, SLOT(tz_by_oracle(olson *, tz_suggestions_t))) ;
-  QObject::connect(nitz_object, SIGNAL(cellular_data_received(const cellular_info_t &)), tz_oracle, SLOT(nitz_data(const cellular_info_t &))) ;
-#endif
 }
 #endif // OFONO
 
@@ -601,67 +560,9 @@ void Timed::unix_signal(int signo)
   }
 }
 
-#if 0
-void Timed::nitz_notification(const cellular_info_t &ci)
-{
-  log_debug() ;
-  log_info("nitz_notification: %s", ci.to_string().c_str()) ;
-  settings->cellular_information(ci) ;
-  log_debug() ;
-}
-#endif
-
-#if 0
-void Timed::tz_by_oracle(olson *tz, tz_suggestions_t s)
-{
-  log_debug("time zone '%s' magicaly detected", tz->name().c_str()) ;
-  settings->cellular_zone->value = tz->name() ;
-  settings->cellular_zone->suggestions = s ;
-  if(settings->local_cellular)
-  {
-    settings->fix_etc_localtime() ;
-    update_oracle_context(true) ;
-  }
-  invoke_signal() ;
-}
-#endif
-
 void Timed::update_oracle_context(bool s)
 {
   log_debug("update_oracle_context(%d): NOT IMPLEMENTED", s);
-#if 0
-  static ContextProvider::Property oracle_p("/com/nokia/time/time_zone/oracle") ;
-  static const char * const uncertain_key = "uncertain" ;
-  static const char * const primary_key = "primary_candidates" ;
-  static const char * const possible_key = "possible_candidates" ;
-
-  if(!set)
-  {
-    oracle_p.unsetValue() ;
-    return ;
-  }
-
-  QMap<QString, QVariant> map ;
-
-  tz_suggestions_t &s = settings->cellular_zone->suggestions ;
-
-  bool uncertain = s.gq == Uncertain ;
-  if(uncertain)
-  {
-    map.insert(uncertain_key, true) ;
-    QList<QVariant> primary_list ;
-    for(vector<olson*>::iterator it=s.zones.begin(); it!=s.zones.end(); ++it)
-      primary_list << string_std_to_q((*it)->name()) ;
-    map.insert(primary_key, primary_list) ;
-    (void) possible_key ; // not used variable
-  }
-  else
-  {
-    map.insert(uncertain_key, false) ;
-  }
-
-  oracle_p.setValue(map) ;
-#endif
 }
 
 void Timed::open_epoch()
@@ -672,26 +573,6 @@ void Timed::open_epoch()
 #endif
 }
 
-
-#if 0
-void Timed::device_mode_reached(bool act_dead, const string &new_address)
-{
-  act_dead_mode = act_dead ;
-  log_debug("act_dead=%d, new_address='%s'", act_dead, new_address.c_str()) ;
-#if 0
-  bool res = setenv("DBUS_SESSION_BUS_ADDRESS", dbus_session.c_str(), true) ;
-  if (res<0)
-  {
-    log_error("can't set DBUS_SESSION_BUS_ADDRESS environment: %m") ;
-    QDBusConnection::disconnectFromBus(session_bus_name.c_str()) ;
-    return ;
-  }
-#endif
-  connect_to_session_bus(session_bus_address = new_address) ;
-  am->device_mode_detected(not act_dead) ;
-  am->unfreeze() ;
-}
-#endif
 void Timed::device_mode_reached(bool user_mode)
 {
   log_notice("MODE: running in %s mode", user_mode ? "USER" : "ACTDEAD") ;
@@ -701,16 +582,7 @@ void Timed::device_mode_reached(bool user_mode)
 
 void Timed::session_reported(const QString &new_address)
 {
-#if 0
-  session_bus_address = new_address.toStdString() ;
-  log_notice("session bus address changed: '%s'", session_bus_address.c_str()) ;
-  if (session_bus_address.empty())
-  {
-    QDBusConnection::disconnectFromBus(session_bus_name.c_str()) ;
-  }
-#else
   (void)new_address ;
-#endif
 }
 
 void Timed::harmattan_desktop_visible()
