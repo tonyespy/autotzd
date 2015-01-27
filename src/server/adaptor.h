@@ -42,7 +42,6 @@
 #include "misc.h"
 #include "csd.h"
 #include "credentials.h"
-#include "peer.h"
 
 #include "../lib/interface.h" // TODO: is Maemo::Timed::bus() the correct way?
 
