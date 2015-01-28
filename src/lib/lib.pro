@@ -3,8 +3,7 @@ TEMPLATE = lib
 QT += dbus
 QT -= gui
 
-equals(QT_MAJOR_VERSION, 4): TARGET = timed
-equals(QT_MAJOR_VERSION, 5): TARGET = timed-qt5
+TARGET = timed
 
 VERSION = 0.$$(TIMED_VERSION)
 
@@ -21,8 +20,7 @@ devheaders.files += hidden/exception exception.h qmacro.h
 devheaders.files += interface interface.h
 devheaders.files += event event-declarations.h
 devheaders.files += wallclock wall-declarations.h
-equals(QT_MAJOR_VERSION, 4): devheaders.path = /usr/include/timed
-equals(QT_MAJOR_VERSION, 5): devheaders.path = /usr/include/timed-qt5
+
 devheaders.path  = /usr/include/$$TARGET
 
 
@@ -41,16 +39,4 @@ INSTALLS = target devheaders prf pc
 
 OTHER_FILES += *.pc *.prf
 
-CONFIG(MEEGO) \
-{
-  message("MEEGO flag is set")
-  DEFINES += __MEEGO__
-} \
-else \
-{
-  message("MEEGO flag is not set, assuming HARMATTAN")
-  DEFINES += __HARMATTAN__
-  LIBS += -lsysinfo
-  QMAKE_CXXFLAGS  += -Wall -Wno-psabi
-}
 QMAKE_CXXFLAGS  += -Wall
