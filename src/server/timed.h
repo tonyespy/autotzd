@@ -101,8 +101,6 @@ public Q_SLOTS:
 Q_SIGNALS:
   void settings_changed(const Maemo::Timed::WallClock::Info &, bool system_time) ;
   void next_bootup_event(int next_boot_event, int next_non_boot_event);
-  void alarm_triggers_changed(Maemo::Timed::Event::Triggers);
-  // void settings_changed_1(bool system_time) ;
 public:
   Timed(int ac, char **av) ;
   virtual ~Timed() ;
@@ -142,9 +140,6 @@ private Q_SLOTS:
   void harmattan_init_done(int runlevel) ;
   void harmattan_desktop_visible() ;
   void kernel_notification(const nanotime_t &jump_forwards) ;
-  void restart_alarm_timer();
-  void set_alarm_present(bool present);
-  void set_alarm_trigger(const QMap<QString, QVariant> &triggers);
 public:
 public Q_SLOTS:
   void check_dst() ;

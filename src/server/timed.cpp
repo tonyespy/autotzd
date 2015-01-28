@@ -321,8 +321,6 @@ Timed::~Timed()
 }
 void Timed::stop_context()
 {
-  delete alarm_present;
-  delete alarm_trigger;
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   delete context_service ;
   delete time_operational_p ;
@@ -534,7 +532,6 @@ void Timed::init_kernel_notification()
 {
   notificator = new kernel_notification_t(this);
   QObject::connect(notificator, SIGNAL(system_time_changed(const nanotime_t &)), this, SLOT(kernel_notification(const nanotime_t &))) ;
-  QObject::connect(notificator, SIGNAL(restart_alarm_timer()), this, SLOT(restart_alarm_timer()));
   notificator->start() ;
 }
 
