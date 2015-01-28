@@ -29,17 +29,8 @@
 #include <QDBusConnectionInterface>
 #include <QDBusServiceWatcher>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <ContextProvider>
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <iodata-qt5/validator>
-#include <iodata-qt5/storage>
-#else
-#include <iodata/validator>
-#include <iodata/storage>
-#endif
+#include <iodata/validator.h>
+#include <iodata/storage.h>
 
 #include "wrappers.h"
 #include "settings.h"
@@ -48,35 +39,15 @@
 #include "olson.h"
 #include "tz.h"
 #include "csd.h"
-#include "peer.h"
 #include "notification.h"
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-namespace statefs {
-  namespace qt {
-    class InOutWriter;
-  }
-}
-#endif
 
 struct Timed : public QCoreApplication
 {
 public:
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   inline const char *configuration_path() { return  "/etc/timed-qt5.rc" ; }
-#else
-  inline const char *configuration_path() { return  "/etc/timed.rc" ; }
-#endif
-  // inline const char *configuration_type() { return  "/usr/share/timed/typeinfo/config.type" ; }
-
   inline const char *customization_path() { return  "/usr/share/timed/customization.data" ; } // TODO: make it configurable
-  // inline const char *customization_type() { return  "/usr/share/timed/typeinfo/customization.type" ; }
-
-  // inline const char *settings_file_type() { return  "/usr/share/timed/typeinfo/settings.type" ; }
 
 private:
-
-  bool scratchbox_mode ;
 
   bool format24_by_default ;
   bool auto_time_by_default ;
@@ -96,14 +67,9 @@ private:
 
   // init_* methods, to be called by constructor only
   void init_unix_signal_handler() ;
-  void init_dbus_peer_info() ;
-  void init_scratchbox_mode() ;
-  void init_act_dead() ;
   void init_configuration() ;
   void init_customization() ;
   void init_read_settings() ;
-  void init_device_mode() ;
-  void init_context_objects() ;
   void init_main_interface_object() ;
   void init_main_interface_dbus_name() ;
   void init_dst_checker() ;
@@ -123,7 +89,6 @@ public:
 #if OFONO
   csd_t *csd ;
 #endif
-  peer_t *peer ;
 
   QDBusConnectionInterface *ses_iface ;
 
@@ -150,7 +115,6 @@ private:
   unsigned threshold_period_long, threshold_period_short ;
   QString data_path, events_path, settings_path;
   int default_gmt_offset ;
-  std::string current_mode ;
   void load_rc() ;
   void load_settings() ;
 public:
@@ -164,16 +128,6 @@ private:
   QTimer *dst_timer ;
   std::string sent_signature ;
   tz_oracle_t *tz_oracle ;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  statefs::qt::InOutWriter *alarm_present;
-  statefs::qt::InOutWriter *alarm_trigger;
-#else
-  ContextProvider::Property *time_operational_p ;
-  ContextProvider::Property *alarm_present;
-  ContextProvider::Property *alarm_trigger;
-  ContextProvider::Service *context_service ;
-#endif
 
 public:
   kernel_notification_t *notificator ;
@@ -192,7 +146,6 @@ private Q_SLOTS:
   void set_alarm_present(bool present);
   void set_alarm_trigger(const QMap<QString, QVariant> &triggers);
 public:
-  void device_mode_reached(bool user_mode) ;
 public Q_SLOTS:
   void check_dst() ;
 public:

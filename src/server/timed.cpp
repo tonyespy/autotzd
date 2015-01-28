@@ -35,12 +35,6 @@
 #include <QDateTime>
 #include <QDir>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <statefs/qt/util.hpp>
-#else
-#include <ContextProvider>
-#endif
-
 #include "queue.type.h"
 #include "config.type.h"
 #include "customization.type.h"
@@ -94,10 +88,7 @@ static void spam()
 }
 
 Timed::Timed(int ac, char **av) :
-  QCoreApplication(ac, av),
-  peer(NULL)
-//  session_bus_name("timed_not_connected"),
-//  session_bus_address("invalid_address")
+  QCoreApplication(ac, av)
 {
   spam() ;
   halted = "" ; // XXX: remove it, as we don't want to halt anymore
@@ -107,8 +98,6 @@ Timed::Timed(int ac, char **av) :
   init_unix_signal_handler() ;
   log_debug() ;
 
-  // init_act_dead() ;
-
   init_configuration() ;
   log_debug() ;
 
@@ -116,12 +105,6 @@ Timed::Timed(int ac, char **av) :
   log_debug() ;
 
   init_read_settings() ;
-  log_debug() ;
-
-  init_device_mode() ;
-  log_debug() ;
-
-  init_context_objects() ;
   log_debug() ;
 
   init_main_interface_object() ;
@@ -163,26 +146,6 @@ void Timed::init_unix_signal_handler()
   signal_object->handle(SIGINT) ;
   signal_object->handle(SIGTERM) ;
   signal_object->handle(SIGCHLD) ;
-}
-
-// * Enable questioning of Dbus peers
-void Timed::init_dbus_peer_info()
-{
-  peer =  new peer_t(true) ;
-}
-
-void Timed::init_device_mode()
-{
-  current_mode = "(unknown)" ;
-  const char *startup_path="/com/nokia/startup/signal", *startup_iface="com.nokia.startup.signal" ;
-  const char *desktop_visible_slot = SLOT(harmattan_desktop_visible()) ;
-  const char *init_done_slot = SLOT(harmattan_init_done(int)) ;
-  bool res1 = QDBusConnection::systemBus().connect("", startup_path, startup_iface, "desktop_visible", this, desktop_visible_slot) ;
-  bool res2 = QDBusConnection::systemBus().connect("", startup_path, startup_iface, "init_done", this, init_done_slot) ;
-  if (not res1)
-    log_critical("can't connect to 'desktop_visible' signal") ;
-  if (not res2)
-    log_critical("can't connect to 'init_done' signal") ;
 }
 
 // * Reading configuration file
@@ -279,25 +242,6 @@ void Timed::init_read_settings()
   delete tree ;
 }
 
-
-void Timed::init_context_objects()
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  alarm_present = new statefs::qt::InOutWriter("Alarm.Present");
-  alarm_trigger = new statefs::qt::InOutWriter("Alarm.Trigger");
-#else
-  context_service = new ContextProvider::Service(Maemo::Timed::bus()) ;
-  context_service -> setAsDefault() ;
-
-  log_debug("(new ContextProvider::Service(Maemo::Timed::bus()))->setAsDefault()") ;
-  alarm_trigger = new ContextProvider::Property("Alarm.Trigger");
-  alarm_present = new ContextProvider::Property("Alarm.Present");
-  ContextProvider::Property("/com/nokia/time/time_zone/oracle") ;
-  time_operational_p = new ContextProvider::Property("/com/nokia/time/system_time/operational") ;
-  time_operational_p->setValue(am->is_epoch_open()) ;
-#endif
-}
-
 void Timed::init_main_interface_object()
 {
   new com_nokia_time(this) ;
@@ -392,18 +336,9 @@ void Timed::stop_dbus()
 }
 void Timed::stop_stuff()
 {
-  log_debug() ;
-  // delete ping ;
-  log_debug() ;
   delete settings ;
   log_debug() ;
-  // delete ses_iface ;
-  log_debug() ;
   delete settings_storage ;
-  log_debug() ;
-  delete short_save_threshold_timer ;
-  log_debug() ;
-  delete long_save_threshold_timer ;
   log_debug() ;
   delete tz_oracle ;
   log_debug() ;
@@ -417,7 +352,6 @@ void Timed::system_owner_changed(const QString &name, const QString &oldowner, c
 {
   log_debug() ;
 }
-
 
 /*
  * xxx
