@@ -1,36 +1,20 @@
 Source: timed
 Section: misc
 Priority: optional
-Maintainer: Victor Portnov <victor.portnov@teleca.com>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Victor Portnov <victor.portnov@teleca.com>
 Uploaders: Philippe De Swert <philippe.de-swert@nokia.com>
-Build-Depends: debhelper (>= 7),
- libqt4-dev (>= 4.7),
+Build-Depends: debhelper (>= 9),
+ qtbase5-dev (>= 5.2.1),
  doxygen,
- libcontextprovider-dev,
- libcontextsubscriber-dev,
- libiodata-dev (>= 0.17),
- libqmlog-dev (>= 0.10),
- libpcre3-dev,
- libcellular-qt-dev,
- libcreds2-dev,
- aegis-builder (>= 1.4),
- libsysinfo-dev,
- libdsme0.2.0-dev,
+ libiodata-dev (>= 0.19),
  python (>= 2.5), asciidoc, xsltproc, docbook-xsl, dblatex, graphviz, ttf-bitstream-vera
-Standards-Version: 3.8.0
-
-# libosso-dev,
-# libdbus-1-dev,
-# libdbus-glib-1-dev,
-# libglib2.0-dev,
-# libconic0-dev,
-# libdsme0.2.0-dev,
-# mce-dev,
+Standards-Version: 3.9.4
 
 Package: timed
 Conflicts: timehd (<< 2.0)
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, tzdata, tzdata-timed, tzdata-libicu, aegisfs
+Depends: ${shlibs:Depends}, ${misc:Depends}, tzdata, tzdata-timed, tzdata-libicu
 Description: time daemon
  The time daemon (timed) managing system time, time
  zone and settings, executing actions at given time and managing the event
@@ -42,13 +26,6 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libqmlog0 (>= 0.0.9)
 Description: timed client library
  Qt based API for communication with timed
-
-Package: libtimed-voland0
-Section: libs
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqmlog0 (>= 0.0.9)
-Description: timed client library for voland
- Qt based API for communication between voland and timed
 
 Package: timed-tools
 Conflicts: timehd (<< 2.0)
@@ -71,16 +48,9 @@ Description: test cases for timed
 Package: libtimed-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libtimed0 (= ${binary:Version}), libqt4-dev (>= 4.6)
+Depends: ${misc:Depends}, libtimed0 (= ${binary:Version}), qtbase5-dev (>= 5.2.1)
 Description: development package for libtimed
  Header files and shared lib symlink for timed client library
-
-Package: libtimed-voland-dev
-Section: libdevel
-Architecture: any
-Depends: ${misc:Depends}, libtimed-voland0 (= ${binary:Version}), libqt4-dev (>= 4.6), libtimed-dev
-Description: development package for libtimed-voland
- Header files and shared lib symlink for timed-voland library
 
 # Documentation
 
@@ -97,14 +67,6 @@ Architecture: all
 Depends: ${misc:Depends}
 Description: libtimed documentation
  The libtimed(3) manual page describing timed client library
-
-Package: libtimed-voland-doc
-Section: doc
-Architecture: all
-Depends: ${misc:Depends}
-Description: libtimed-voland documentation
- The libtimed-voland(3) manual page describing timed to voland
- communication library
 
 # Debugging symbols
 
@@ -123,14 +85,6 @@ Architecture: any
 Depends: libtimed0 (= ${binary:Version}), ${misc:Depends}
 Description: libtimed0 debugging symbols
  Debugging information for time daemon interface library
-
-Package: libtimed-voland0-dbg
-Section: libdevel
-Priority: extra
-Architecture: any
-Depends: libtimed-voland0 (= ${binary:Version}), ${misc:Depends}
-Description: libtimed-voland0 debugging symbols
- Debugging information for time daemon to voland interface library
 
 Package: timed-tools-dbg
 Section: libdevel
