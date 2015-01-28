@@ -24,8 +24,8 @@
 #ifndef CUSTOMIZATION_H
 #define CUSTOMIZATION_H
 
-#include <iodata/storage>
-#include <iodata/iodata>
+#include <iodata/storage.h>
+#include <iodata/iodata.h>
 
 struct customization_t
 {
