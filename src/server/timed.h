@@ -109,7 +109,6 @@ public:
 private:
   iodata::storage *event_storage, *settings_storage ;
 
-  simple_timer *short_save_threshold_timer, *long_save_threshold_timer ;
   unsigned threshold_period_long, threshold_period_short ;
   QString data_path, events_path, settings_path;
   int default_gmt_offset ;
