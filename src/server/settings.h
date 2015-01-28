@@ -26,12 +26,8 @@
 
 #include <string>
 
-#include <QtGlobal>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <iodata-qt5/iodata>
-#else
-#include <iodata/iodata>
-#endif
+/* #include <QtGlobal> */
+#include <iodata/iodata.h>
 
 #include "onitz.h"
 
