@@ -27,8 +27,6 @@
 #include "../lib/imagetype.h"
 #include "../common/log.h"
 
-#include "f.h"
-
 #include <QMetaType>
 int main(int ac, char **av)
 {
