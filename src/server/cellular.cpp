@@ -32,9 +32,7 @@ using namespace std;
 #include "tzdata.h"
 #include "../common/log.h"
 
-#if OFONO
 #include "csd.h"
-#endif
 
 cellular_operator_t::cellular_operator_t()
 {
@@ -46,7 +44,6 @@ cellular_operator_t::cellular_operator_t(const string &mcc_s, const string &mnc_
   init() ;
 }
 
-#if OFONO
 cellular_operator_t::cellular_operator_t(const QString &mcc_s, const QString &mnc_s)
 {
   mcc = mcc_s.toStdString(), mnc = mnc_s.toStdString() ;
@@ -61,7 +58,6 @@ cellular_operator_t::cellular_operator_t(const NetworkTimeInfo &cnti)
     init() ;
   }
 }
-#endif
 
 bool cellular_operator_t::operator==(const cellular_operator_t &x) const // same mcc & mnc
 {
@@ -115,7 +111,6 @@ cellular_time_t::cellular_time_t() :
   log_debug("constructed %s by default", str().c_str()) ;
 }
 
-#if OFONO
 cellular_time_t::cellular_time_t(const NetworkTimeInfo &cnti) :
   value(0), ts(0)
 {
@@ -126,7 +121,6 @@ cellular_time_t::cellular_time_t(const NetworkTimeInfo &cnti) :
   }
   log_debug("constructed %s out of %s", str().c_str(), csd_t::csd_network_time_info_to_string(cnti).c_str()) ;
 }
-#endif
 
 string cellular_time_t::str() const
 {
@@ -147,7 +141,6 @@ cellular_offset_t::cellular_offset_t() :
   log_debug("constructed %s by default", str().c_str()) ;
 }
 
-#if OFONO
 cellular_offset_t::cellular_offset_t(const NetworkTimeInfo &cnti) :
   oper(cnti),
   offset(0), dst(-1), timestamp(0), sender_time(false)
@@ -184,7 +177,6 @@ cellular_offset_t::cellular_offset_t(const NetworkTimeInfo &cnti) :
   }
   log_debug("constructed %s out of %s", str().c_str(), csd_t::csd_network_time_info_to_string(cnti).c_str()) ;
 }
-#endif
 
 string cellular_offset_t::str() const
 {

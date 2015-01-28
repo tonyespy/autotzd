@@ -118,9 +118,7 @@ Timed::Timed(int ac, char **av) :
   init_first_boot_hwclock_time_adjustment_check();
   log_debug() ;
 
-#if OFONO
   init_cellular_services() ;
-#endif // OFONO
 
   log_debug() ;
 
@@ -276,8 +274,6 @@ void Timed::init_main_interface_dbus_name()
   }
 }
 
-
-#if OFONO
 void Timed::init_cellular_services()
 {
   tzdata::init(tz_by_default) ;
@@ -295,7 +291,6 @@ void Timed::init_cellular_services()
   log_assert(res4) ;
 
 }
-#endif // OFONO
 
 void Timed::init_dst_checker()
 {

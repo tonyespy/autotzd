@@ -26,8 +26,6 @@
 
 #include "csd.h"
 
-#if OFONO
-
 csd_t::csd_t(Timed *owner)
   : QObject(owner)
 {
@@ -204,4 +202,3 @@ string csd_t::csd_network_time_info_to_string(const NetworkTimeInfo &nti)
 
   return os.str() ;
 }
-#endif//OFONO

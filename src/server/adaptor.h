@@ -289,7 +289,6 @@ public slots:
     timed->halt(string_q_to_std(what)) ;
   }
 
-#if OFONO
   bool fake_csd_time_signal(const QString &mcc, const QString &mnc, int offset, int time, int dst, int seconds, int nano_seconds)
   {
     log_notice("(fake_csd_time_signal) mcc='%s' mnc='%s' offset=%d time=%d dst=%d seconds=%d nano_seconds=%d", mcc.toStdString().c_str(), mnc.toStdString().c_str(), offset, time, dst, seconds, nano_seconds) ;
@@ -335,7 +334,6 @@ public slots:
     timed->csd->process_csd_network_operator(mcc, mnc) ;
     return true ;
   }
-#endif // OFONO
 } ;
 
 #endif

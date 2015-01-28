@@ -86,9 +86,7 @@ public:
 
   source_settings *settings ;
   cellular_handler *nitz_object ;
-#if OFONO
   csd_t *csd ;
-#endif
 
   QDBusConnectionInterface *ses_iface ;
 

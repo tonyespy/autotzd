@@ -24,8 +24,6 @@
 #ifndef MAEMO_TIMED_CSD_H
 #define MAEMO_TIMED_CSD_H
 
-#if OFONO
-
 #include <string>
 
 #include <QTimer>
@@ -75,7 +73,4 @@ public:
   static std::string csd_network_time_info_to_string(const NetworkTimeInfo &nti) ;
   virtual ~csd_t() ;
 } ;
-
-#endif//OFONO
-
 #endif//MAEMO_TIMED_CSD_H

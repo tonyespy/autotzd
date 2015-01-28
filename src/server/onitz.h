@@ -34,12 +34,9 @@ using namespace std ;
 
 #include "../common/log.h"
 
-#if OFONO
 # include "networktime.h"
 # include "networkoperator.h"
 # include "networktimeinfo.h"
-#endif
-
 
 #include "../lib/nanotime.h"
 
