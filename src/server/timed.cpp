@@ -505,27 +505,9 @@ void Timed::open_epoch()
 #endif
 }
 
-void Timed::device_mode_reached(bool user_mode)
-{
-  log_notice("MODE: running in %s mode", user_mode ? "USER" : "ACTDEAD") ;
-  am->device_mode_detected(user_mode) ;
-  am->unfreeze() ;
-}
-
 void Timed::session_reported(const QString &new_address)
 {
   (void)new_address ;
-}
-
-void Timed::harmattan_desktop_visible()
-{
-  device_mode_reached(true) ; // USER mode
-}
-
-void Timed::harmattan_init_done(int runlevel)
-{
-  if (runlevel==4)
-    device_mode_reached(false) ; // ACT_DEAD mode
 }
 
 void Timed::init_kernel_notification()

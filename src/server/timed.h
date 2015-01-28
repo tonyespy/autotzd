@@ -137,8 +137,6 @@ public Q_SLOTS:
 private Q_SLOTS:
   void queue_threshold_timeout() ;
   void unix_signal(int signo) ;
-  void harmattan_init_done(int runlevel) ;
-  void harmattan_desktop_visible() ;
   void kernel_notification(const nanotime_t &jump_forwards) ;
 public:
 public Q_SLOTS:
