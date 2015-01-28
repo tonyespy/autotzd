@@ -69,7 +69,6 @@ public:
   {
     setAutoRelaySignals(true) ;
   }
-  // void emit_settings(Maemo::Timed::WallClock::wall_info_pimple_t *p) { emit settings_changed(p) ; }
 
 signals:
   void settings_changed(const Maemo::Timed::WallClock::Info &, bool) ;
@@ -104,7 +103,6 @@ public slots:
   {
     Q_UNUSED(message);
     log_notice("DBUS::com.nokia.time.wall_clock_settings(%s) by %s", p.SQC, PEER) ;
-    // log_debug("%s", string_std_to_q(p.str()).c_str()) ;
     return timed->settings->wall_clock_settings(p) ;
   }
 
