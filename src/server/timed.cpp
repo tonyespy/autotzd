@@ -26,7 +26,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <systemd/sd-daemon.h>
 
 #include <QDBusConnection>
 #include <QDBusInterface>
@@ -131,9 +130,16 @@ Timed::Timed(int ac, char **av) :
 
   log_info("daemon is up and running") ;
 
-  if (arguments().indexOf("--systemd") >= 0) {
-      sd_notify(0, "READY=1");
-  }
+  /*
+   * TODO(awe): for now disable this code, as it may not
+   * be necessary to notify systemd that this job is ready
+   * *AND* we haven't yet switched touch to systemd by
+   * default for system jobs:
+   *
+   * if (arguments().indexOf("--systemd") >= 0) {
+   *  sd_notify(0, "READY=1");
+   * }
+   */
 }
 
 // * Start Unix signal handling
