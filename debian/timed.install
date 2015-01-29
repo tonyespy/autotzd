@@ -18,11 +18,5 @@ usr/share/backup-framework/scripts
 /etc/osso-cud-scripts
 /etc/osso-rfs-scripts
 
-# session bus address helper
-usr/bin/timed-aegis-session-helper
-
-# aegisfs mount point config
-etc/aegisfs.d
-
 # config file
 etc/timed.rc
