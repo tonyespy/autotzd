@@ -90,7 +90,7 @@ Timed::Timed(int ac, char **av) :
   QCoreApplication(ac, av)
 {
   spam() ;
-  halted = "" ; // XXX: remove it, as we don't want to halt anymore
+
   first_boot_date_adjusted = false;
   log_debug() ;
 
@@ -118,10 +118,6 @@ Timed::Timed(int ac, char **av) :
   log_debug() ;
 
   init_cellular_services() ;
-
-  log_debug() ;
-
-  init_dst_checker() ;
 
   log_debug("applying time zone settings") ;
 
@@ -229,7 +225,6 @@ void Timed::init_read_settings()
   settings_storage->set_primary_path(settings_path.toStdString());
   settings_storage->set_secondary_path(settings_path.toStdString() + ".bak");
   settings_storage->set_validator(settings_data_validator(), "settings_t") ;
-
   iodata::record *tree = settings_storage->load() ;
 
   log_assert(tree, "loading settings failed") ;
@@ -298,14 +293,6 @@ void Timed::init_cellular_services()
 
 }
 
-void Timed::init_dst_checker()
-{
-  log_debug() ;
-  dst_timer = new QTimer ;
-  dst_timer->setSingleShot(true) ;
-  QObject::connect(dst_timer, SIGNAL(timeout()), this, SLOT(check_dst())) ;
-}
-
 void Timed::init_apply_tz_settings()
 {
   settings->postload_fix_manual_zone() ;
@@ -332,8 +319,6 @@ void Timed::stop_stuff()
   delete settings_storage ;
   log_debug() ;
   delete tz_oracle ;
-  log_debug() ;
-  delete dst_timer ;
   log_debug() ;
   cellular_handler::uninitialize() ;
   log_notice("stop_stuff() DONE") ;
@@ -376,62 +361,6 @@ void Timed::invoke_signal(const nanotime_t &back)
   int methodIndex = this->metaObject()->indexOfMethod("send_time_settings()") ;
   QMetaMethod method = this->metaObject()->method(methodIndex);
   method.invoke(this, Qt::QueuedConnection);
-  log_assert(q_pause==NULL) ;
-}
-
-void Timed::send_time_settings()
-{
-  log_debug() ;
-  log_debug("settings=%p", settings) ;
-  log_debug("settings->cellular_zone=%p", settings->cellular_zone) ;
-  log_debug("settings->cellular_zone='%s'", settings->cellular_zone->zone().c_str()) ;
-  nanotime_t diff = systime_back ;
-  clear_invokation_flag() ;
-  save_settings() ;
-  settings->fix_etc_localtime() ;
-  sent_signature = dst_signature(time(NULL)) ;
-  Maemo::Timed::WallClock::Info info(settings->get_wall_clock_info(diff)) ;
-  log_notice("sending signal 'settings_changed': %s", info.str().toStdString().c_str()) ;
-  emit settings_changed(info, not diff.is_zero()) ;
-  log_notice("signal 'settings_changed' sent") ;
-  // emit settings_changed_1(systime) ;
-  am->reshuffle_queue(diff) ;
-  if(q_pause)
-  {
-    delete q_pause ;
-    q_pause = NULL ;
-  }
-  check_dst() ; // reschedule dst timer
-}
-
-void Timed::check_dst()
-{
-  dst_timer->stop() ;
-  time_t t = time(NULL) ;
-  string signature = dst_signature(t) ;
-  if (signature != sent_signature)
-  {
-    invoke_signal() ;
-    return ;
-  }
-
-  int look_forward = 3600 ; // 1 hour
-  string signature_2 = dst_signature(t+look_forward) ;
-  if (signature_2 == signature)
-  {
-    dst_timer->start(1000*(look_forward-60)) ; // 1 minute less
-    return ;
-  }
-
-  int a=0, b=look_forward ;
-  while (b-a > 1)
-  {
-    int c = (a+b) / 2 ;
-    (signature==dst_signature(t+c) ? a : b) = c ;
-  }
-  // now 'a' is the time until the last 'old time' second
-  //     'b=a+1' until the first 'new time' second
-  dst_timer->start(1000*b) ;
 }
 
 void Timed::unix_signal(int signo)
@@ -488,11 +417,6 @@ void Timed::unix_signal(int signo)
 void Timed::update_oracle_context(bool s)
 {
   log_debug("update_oracle_context(%d): NOT IMPLEMENTED", s);
-}
-
-void Timed::open_epoch()
-{
-  am->open_epoch() ;
 }
 
 void Timed::session_reported(const QString &new_address)

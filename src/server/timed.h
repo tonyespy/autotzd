@@ -72,7 +72,6 @@ private:
   void init_read_settings() ;
   void init_main_interface_object() ;
   void init_main_interface_dbus_name() ;
-  void init_dst_checker() ;
   void init_cellular_services() ;
   void init_apply_tz_settings() ;
   void init_kernel_notification() ;
@@ -114,13 +113,8 @@ private:
 public:
   void save_settings() ;
 private:
-  Q_INVOKABLE void save_event_queue() ;
-
-  Q_INVOKABLE void send_time_settings() ;
   bool signal_invoked ;
   nanotime_t systime_back ;
-  QTimer *dst_timer ;
-  std::string sent_signature ;
   tz_oracle_t *tz_oracle ;
 
 public:
@@ -135,13 +129,7 @@ private Q_SLOTS:
   void unix_signal(int signo) ;
   void kernel_notification(const nanotime_t &jump_forwards) ;
 public:
-public Q_SLOTS:
-  void check_dst() ;
-public:
   void update_oracle_context(bool set) ;
-  void open_epoch() ;
-  void halt(const string &what) { halted = what ; exit(0) ; } // exit the main loop
-  string is_halted() { return halted ; }
 private:
   string halted ;
   UnixSignal *signal_object ;
