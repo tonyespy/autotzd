@@ -48,9 +48,6 @@ SOURCES += tzdata.cpp \
     modemwatcher.cpp \
     ofonoconstants.cpp
 
-SOURCES += credentials.cpp
-HEADERS += credentials.h
-
 SOURCES += olson.cpp tz.cpp
 HEADERS += tz.h
 
