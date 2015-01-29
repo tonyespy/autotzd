@@ -1,2 +1,20 @@
-src/ -- Harmattan Qt-based implementation
-debian/ -- packaging stuff
+This README describes the upstream rilmodem/ofono git repository hosted on
+github:
+
+https://github.com/rilmodem/autotz
+
+autotz is a fork of timed, a daemon originally created as part of Nokia's
+MAEMO project, and used as part of Moblin, MeegGo, and currently Sailfish
+OS.
+
+The code was forked from the nemomobile repository on github:
+
+https://github.com/nemomobile/timed
+
+Most of the original code has been deleted, leaving just the cellular timezone
+logic which used to calculate new timezones based upon updates from ofono's
+NetworkRegistration and NetworkTime interfaces.
+
+
+
+
