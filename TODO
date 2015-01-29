@@ -1,0 +1,9 @@
+This file is used to track remaining work items for autotz.
+
+1. Fix debian/rules
+2. Fix lintian errors reported dh_builddeb
+3. Add simple DBus API which exposes settings as properties
+4. Integrate with systemd-timedated to allow autotz to update
+the system timezone and clock.
+5. [Optional] re-format code to introduce whitespace
+6. [Optional] update C++ usage ( see more effective C++ )
