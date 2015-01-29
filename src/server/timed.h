@@ -78,7 +78,6 @@ private:
   void init_kernel_notification() ;
 
 public:
-  void stop_context() ;
   void stop_stuff() ;
   void stop_dbus() ;
 

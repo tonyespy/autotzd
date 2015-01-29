@@ -316,16 +316,8 @@ void Timed::init_apply_tz_settings()
 
 Timed::~Timed()
 {
-  stop_context() ;
   stop_dbus() ;
   stop_stuff() ;
-}
-void Timed::stop_context()
-{
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  delete context_service ;
-  delete time_operational_p ;
-#endif
 }
 void Timed::stop_dbus()
 {
@@ -501,9 +493,6 @@ void Timed::update_oracle_context(bool s)
 void Timed::open_epoch()
 {
   am->open_epoch() ;
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  time_operational_p->setValue(true) ;
-#endif
 }
 
 void Timed::session_reported(const QString &new_address)
