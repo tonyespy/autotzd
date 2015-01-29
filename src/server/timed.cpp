@@ -112,16 +112,9 @@ Timed::Timed(int ac, char **av) :
   log_debug() ;
 
   init_kernel_notification();
-
-  init_first_boot_hwclock_time_adjustment_check();
   log_debug() ;
 
   init_cellular_services() ;
-
-  log_debug("applying time zone settings") ;
-
-  init_apply_tz_settings() ;
-  log_debug() ;
 
   log_info("daemon is up and running") ;
 
@@ -292,14 +285,6 @@ void Timed::init_cellular_services()
 
 }
 
-void Timed::init_apply_tz_settings()
-{
-  settings->postload_fix_manual_zone() ;
-  settings->postload_fix_manual_offset() ;
-  if(settings->check_target(settings->etc_localtime()) != 0)
-    invoke_signal() ;
-}
-
 Timed::~Timed()
 {
   stop_dbus() ;
@@ -434,36 +419,4 @@ void Timed::kernel_notification(const nanotime_t &jump_forwards)
 {
   log_notice("KERNEL: system time changed by %s", jump_forwards.str().c_str()) ;
   settings->process_kernel_notification(jump_forwards) ;
-}
-
-void Timed::init_first_boot_hwclock_time_adjustment_check() {
-    if (first_boot_date_adjusted)
-        return;
-
-    QString path = data_path + QDir::separator() + "first-boot-hwclock.dat";
-    QFile file(path);
-    if (file.exists()) {
-        first_boot_date_adjusted = true;
-        return;
-    }
-
-    if (QDate::currentDate().year() < 2013) {
-        log_info("first boot, updating old date from year %d to 01/01/2013", QDate::currentDate().year());
-        settings->set_system_time(1357041600); // January 1, 12:00:00, 2013
-    }
-
-    first_boot_date_adjusted = true;
-
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        log_error("Failed to open file %s", path.toStdString().c_str());
-        return;
-    }
-    if (!file.isWritable()) {
-        log_error("File not writable: %s", path.toStdString().c_str());
-        return;
-    }
-
-    QTextStream out(&file);
-    out << QDateTime::currentDateTime().toString() << "\n";
-    file.close();
 }

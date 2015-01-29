@@ -158,46 +158,19 @@ struct source_settings : public QObject
   zone_source_t *manual_zone ;
   cellular_zone_t *cellular_zone ;
   offset_source_t *manual_offset, *nitz_offset ;
-  utc_source_t *manual_utc, *nitz_utc, *gps_utc;
-  key_int_t *app_snooze ;
+  utc_source_t *manual_utc, *nitz_utc;
 
   bool time_nitz, local_cellular, auto_dst ;
   bool format_24 ;
-  bool alarms_are_enabled ;
-  int default_snooze_value ;
-
-  int default_snooze() const ;
-  int default_snooze(int new_value) ;
-
-  int get_app_snooze(const string &app) ;
-  int get_app_snooze(const string &app, int default_value) ;
-  int set_app_snooze(const string &app, int value) ;
-  void remove_app_snooze(const string &app) ;
-
   int offset() const ;
   string zone() const ;
-  string human_readable_timezone() const ;
-  string etc_localtime() const ;
   nanotime_t value_at_zero() const ;
-
-  void set_system_time(const nanotime_t &) ;
 
   map<string,source_t*> src ;
 
   void load(const iodata::record *, const string &defult_tz) ;
   iodata::record *save() const ;
 
-  Maemo::Timed::WallClock::wall_info_pimple_t *get_wall_clock_info(const nanotime_t &) const ;
-  bool wall_clock_settings(const Maemo::Timed::WallClock::wall_settings_pimple_t &p) ;
-
-  static string symlink_target(int offset_sec) ;
-  static bool east_of_greenwich(string &result, int offset_sec, bool reverse=false) ;
-  static string symlink_target(string zone) ;
-  static int check_target(string path) ;
-
-  void fix_etc_localtime() ;
-  void postload_fix_manual_zone() ;
-  void postload_fix_manual_offset() ;
   void process_kernel_notification(const nanotime_t &jump_forwards) ;
 
   Q_OBJECT ;
