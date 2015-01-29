@@ -7,7 +7,7 @@ Uploaders: Philippe De Swert <philippe.de-swert@nokia.com>
 Build-Depends: debhelper (>= 9),
  qtbase5-dev (>= 5.2.1),
  doxygen,
- libiodata-dev (>= 0.19),
+ libiodata-dev (>= 0.18),
  python (>= 2.5), asciidoc, xsltproc, docbook-xsl, dblatex, graphviz, ttf-bitstream-vera
 Standards-Version: 3.9.4
 
@@ -19,80 +19,6 @@ Description: time daemon
  The time daemon (timed) managing system time, time
  zone and settings, executing actions at given time and managing the event
  queue.
-
-Package: libtimed0
-Section: libs
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqmlog0 (>= 0.0.9)
-Description: timed client library
- Qt based API for communication with timed
-
-Package: timed-tools
-Conflicts: timehd (<< 2.0)
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, timed (= ${binary:Version})
-Description: command line tools for communication with the time daemon
- Command line timed tools: 'simple-client' - a command line
- simple client for time daemon; 'fake-dialog-ui' - a command
- line voland implementation; 'ticker' - a command line clock
- and signal notification.
-
-Package: timed-tests
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, timed-tools (=${binary:Version}), ci-testing
-Description: test cases for timed
- Simple automated test cases, to be executed in cita
-
-# Development packages
-
-Package: libtimed-dev
-Section: libdevel
-Architecture: any
-Depends: ${misc:Depends}, libtimed0 (= ${binary:Version}), qtbase5-dev (>= 5.2.1)
-Description: development package for libtimed
- Header files and shared lib symlink for timed client library
-
-# Documentation
-
-Package: timed-doc
-Section: doc
-Architecture: all
-Depends: ${misc:Depends}
-Description: timed documentation
- The timed(8) manual page describing time daemon
-
-Package: libtimed-doc
-Section: doc
-Architecture: all
-Depends: ${misc:Depends}
-Description: libtimed documentation
- The libtimed(3) manual page describing timed client library
-
-# Debugging symbols
-
-Package: timed-dbg
-Section: libdevel
-Priority: extra
-Architecture: any
-Depends: timed (= ${binary:Version}), ${misc:Depends}
-Description: timed debugging symbols
- Debugging information for the time daemon
-
-Package: libtimed0-dbg
-Section: libdevel
-Priority: extra
-Architecture: any
-Depends: libtimed0 (= ${binary:Version}), ${misc:Depends}
-Description: libtimed0 debugging symbols
- Debugging information for time daemon interface library
-
-Package: timed-tools-dbg
-Section: libdevel
-Priority: extra
-Architecture: any
-Depends: timed-tools (= ${binary:Version}), ${misc:Depends}
-Description: timed-tools debugging symbols
- Debugging symbols for commad line time daemon tools
 
 Package: timed-log
 Architecture: any
