@@ -7,3 +7,6 @@ This file is used to track remaining work items for autotz.
 the system timezone and clock.
 5. [Optional] re-format code to introduce whitespace
 6. [Optional] update C++ usage ( see more effective C++ )
+7. evalutate /tests
+8. add unit tests
+9. evaluate /tools
