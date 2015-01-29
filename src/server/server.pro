@@ -12,7 +12,7 @@ INCLUDEPATH += ../h
 QMAKE_LIBDIR_FLAGS += -L../lib
 LIBS += -ltimed
 
-IODATA_TYPES = queue.type config.type settings.type customization.type tzdata.type
+IODATA_TYPES = config.type settings.type customization.type tzdata.type
 
 HEADERS += settings.h \
     csd.h \

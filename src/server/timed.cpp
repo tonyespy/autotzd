@@ -34,7 +34,6 @@
 #include <QDateTime>
 #include <QDir>
 
-#include "queue.type.h"
 #include "config.type.h"
 #include "customization.type.h"
 #include "settings.type.h"
