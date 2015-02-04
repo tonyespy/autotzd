@@ -1,12 +1,15 @@
-This file is used to track remaining work items for autotz.
+This file is used to track remaining work items for autotzd.
 
 1. Fix debian/rules
 2. Fix lintian errors reported dh_builddeb
 3. Add simple DBus API which exposes settings as properties
-4. Integrate with systemd-timedated to allow autotz to update
+4. Add new DBus policy configuration
+5. Integrate with systemd-timedated to allow autotz to update
 the system timezone and clock.
-5. [Optional] re-format code to introduce whitespace
-6. [Optional] update C++ usage ( see more effective C++ )
-7. evalutate /tests
-8. add unit tests
-9. evaluate /tools
+6. [Optional] re-format code to introduce whitespace
+7. [Optional] update C++ usage ( see more effective C++ )
+8. evalutate /tests
+9. add unit tests
+10. add client script(s)
+11. get rid of #if DEADCODE...
+12. checkout BSD_SOURCE!
