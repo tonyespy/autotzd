@@ -1,60 +1,10 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
 
-# vim:syntax=make:
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-export DH_VERBOSE=1
-export TIMED_VERSION=$(shell head -n1 debian/changelog | sed "s/.*(\([^)+]*\).*/\1/")
+export QT_SELECT=qt5
 
-.PHONY: build clean realclean install configure binary-indep binary-arch binary
-
-clean:
-	echo TARGET clean
-	dh_testdir
-	dh_testroot
-	$(MAKE) -C src distclean || test ! -f timed/Makefile
-	find src -name Makefile | xargs rm -f
-	rm -f build-stamp configure-stamp
-	dh_clean
-
-configure: configure-stamp
-configure-stamp:
-	echo TARGET configure
-	dh_testdir
-	rm -rf src/h
-	mkdir -p src/h
-	ln -s ../server src/h/daemon
-	cd src && qmake -recursive
-	touch $@
-
-build: build-stamp
-build-stamp: configure
-	echo TARGET build
-	dh_testdir
-	dh_prep
-	cd src && make
-	touch $@
-
-install: build
-	echo TARGET install
-	dh_testdir
-	dh_installdirs
-	cd src && make install INSTALL_ROOT=$(CURDIR)/debian/tmp
-	mkdir -p -m 0755 $(CURDIR)/debian/tmp/var/cache/timed
-	touch $(CURDIR)/debian/tmp/var/cache/timed/SYSTEM_TIME_LOST
-	touch $(CURDIR)/debian/tmp/var/cache/timed/DEBUG
-	touch $(CURDIR)/debian/tmp/var/cache/timed/HOME_LOG
-	dh_link -ptimed usr/bin/timed usr/bin/cute-timed
-
-binary: binary-indep binary-arch
-binary-indep:
-binary-arch: install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs
-	dh_install --sourcedir=$(CURDIR)/debian/tmp
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+%:
+	dh  $@

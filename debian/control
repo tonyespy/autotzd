@@ -1,4 +1,4 @@
-Source: timed
+Source: autotzd
 Section: misc
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
@@ -6,35 +6,15 @@ XSBC-Original-Maintainer: Victor Portnov <victor.portnov@teleca.com>
 Uploaders: Philippe De Swert <philippe.de-swert@nokia.com>
 Build-Depends: debhelper (>= 9),
  qtbase5-dev (>= 5.2.1),
- doxygen,
  libiodata-dev (>= 0.18),
- python (>= 2.5), asciidoc, xsltproc, docbook-xsl, dblatex, graphviz, ttf-bitstream-vera
-Standards-Version: 3.9.4
+ libpcre3-dev (>= 1:8.35)
+Standards-Version: 3.9.5
 
-Package: timed
-Conflicts: timehd (<< 2.0)
+Package: autotzd
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, tzdata, tzdata-timed, tzdata-libicu
-Description: time daemon
- The time daemon (timed) managing system time, time
- zone and settings, executing actions at given time and managing the event
- queue.
+Depends: ${shlibs:Depends}, ${misc:Depends}, tzdata, tzdata-timed
+Description: timezone detection daemon
+ The automatic time zone daemon (autotzd) detects time zones based upon
+ events and queries made to ofono, and will in turn use systemd-timedated
+ to change the time zone.
 
-Package: timed-log
-Architecture: any
-Depends: ${misc:Depends}
-Description: enables verbose logging of time daemon
- Contains the file /var/cache/timed/DEBUG, switching the logging of time daemon on
-
-Package: timed-home-log
-Architecture: any
-Depends: ${misc:Depends}, timed-log (= ${binary:Version})
-Description: creeates a second copy of the log file, in the user home directory tree
- Contains the file /var/cache/timed/HOME_LOG, enabling the additional log file in user directory
-
-Package: invalid-time
-Architecture: any
-Depends: ${misc:Depends}
-Description: makes the system time invalid
- Contains the file /var/cache/timed/SYSTEM_TIME_LOST
- marking the system time as invalid
