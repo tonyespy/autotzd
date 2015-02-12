@@ -1,26 +1,26 @@
-/***************************************************************************
-**                                                                        **
-**   Copyright (C) 2009-2011 Nokia Corporation.                           **
-**                                                                        **
-**   Author: Ilya Dogolazky <ilya.dogolazky@nokia.com>                    **
-**   Author: Simo Piiroinen <simo.piiroinen@nokia.com>                    **
-**   Author: Victor Portnov <ext-victor.portnov@nokia.com>                **
-**                                                                        **
-**     This file is part of Timed                                         **
-**                                                                        **
-**     Timed is free software; you can redistribute it and/or modify      **
-**     it under the terms of the GNU Lesser General Public License        **
-**     version 2.1 as published by the Free Software Foundation.          **
-**                                                                        **
-**     Timed is distributed in the hope that it will be useful, but       **
-**     WITHOUT ANY WARRANTY;  without even the implied warranty  of       **
-**     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               **
-**     See the GNU Lesser General Public License  for more details.       **
-**                                                                        **
-**   You should have received a copy of the GNU  Lesser General Public    **
-**   License along with Timed. If not, see http://www.gnu.org/licenses/   **
-**                                                                        **
-***************************************************************************/
+/*
+ *  Autotzd - automatic timezone detection
+ *
+ *  This file was originally sourced from timed, see top-level
+ *  README file for more details.
+
+ *  Copyright (C) 2009-2011 Nokia Corporation.
+ *  Copyright (C) 2015 Canonical, Inc.
+ *
+ *  autotzd is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License
+ *  version 2.1 as published by the Free Software Foundation.
+ *
+ *  autotzd is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY;  without even the implied warranty  of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License  for more details.
+ *
+ *  You should have received a copy of the GNU  Lesser General Public
+ *  License along with autotzd. If not, see http://www.gnu.org/licenses/
+ *
+ */
+
 #define _BSD_SOURCE
 
 #include <errno.h>
@@ -39,7 +39,7 @@
 #include "settings.type.h"
 
 #include "adaptor.h"
-#include "timed.h"
+#include "autotzd.h"
 #include "settings.h"
 #include "tz.h"
 #include "tzdata.h"
@@ -85,7 +85,7 @@ static void spam()
 #endif
 }
 
-Timed::Timed(int ac, char **av) :
+Autotzd::Autotzd(int ac, char **av) :
   QCoreApplication(ac, av)
 {
   spam() ;
@@ -105,11 +105,11 @@ Timed::Timed(int ac, char **av) :
   init_read_settings() ;
   log_debug() ;
 
-  init_main_interface_object() ;
-  log_debug() ;
+  //  init_main_interface_object() ;
+  //  log_debug() ;
 
-  init_main_interface_dbus_name() ;
-  log_debug() ;
+  //  init_main_interface_dbus_name() ;
+  //  log_debug() ;
 
   init_kernel_notification();
   log_debug() ;
@@ -131,7 +131,7 @@ Timed::Timed(int ac, char **av) :
 }
 
 // * Start Unix signal handling
-void Timed::init_unix_signal_handler()
+void Autotzd::init_unix_signal_handler()
 {
   signal_object = UnixSignal::object() ;
   QObject::connect(signal_object, SIGNAL(signal(int)), this, SLOT(unix_signal(int))) ;
@@ -142,7 +142,7 @@ void Timed::init_unix_signal_handler()
 
 // * Reading configuration file
 // * Warning if no exists (which is okey)
-void Timed::init_configuration()
+void Autotzd::init_configuration()
 {
   iodata::storage *config_storage = new iodata::storage ;
   config_storage->set_primary_path(configuration_path()) ;
@@ -179,7 +179,7 @@ static bool parse_boolean(const string &str)
 }
 
 // * read customization data provided by customization package
-void Timed::init_customization()
+void Autotzd::init_customization()
 {
   iodata::storage *storage = new iodata::storage ;
   storage->set_primary_path(customization_path()) ;
@@ -211,7 +211,7 @@ void Timed::init_customization()
 
 // * read settings
 // * apply customization defaults, if needed
-void Timed::init_read_settings()
+void Autotzd::init_read_settings()
 {
   settings_storage = new iodata::storage ;
   settings_storage->set_primary_path(settings_path.toStdString());
@@ -232,42 +232,43 @@ void Timed::init_read_settings()
 
   delete tree ;
 }
-
-void Timed::init_main_interface_object()
+/*
+void Autotzd::init_main_interface_object()
 {
   new com_nokia_time(this) ;
-  QDBusConnection conn = Maemo::Timed::bus() ;
-  const char * const path = Maemo::Timed::objpath() ;
+  QDBusConnection conn = Maemo::Autotzd::bus() ;
+  const char * const path = Maemo::Autotzd::objpath() ;
   if (conn.registerObject(path, this))
     log_info("main interface object registered on path '%s'", path) ;
   else
-    log_critical("remote methods not available; failed to register dbus object: %s", Maemo::Timed::bus().lastError().message().toStdString().c_str()) ;
+    log_critical("remote methods not available; failed to register dbus object: %s", Maemo::Autotzd::bus().lastError().message().toStdString().c_str()) ;
   // XXX:
   // probably it's a good idea to terminate if failed
   // (usually it means, the dbus connection is not available)
   // but on the other hand we can still provide some services (like setting time and zone)
   // Anyway, we will terminate if the mutex like name is not available
 }
-
-void Timed::init_main_interface_dbus_name()
+*/
+/*
+void Autotzd::init_main_interface_dbus_name()
 {
   // We're misusing the dbus name as a some kind of mutex:
   //   only one instance of timed is allowed to run.
   // This is the why we can't drop the name later.
 
-  const string conn_name = Maemo::Timed::bus().name().toStdString() ;
-  if (Maemo::Timed::bus().registerService(Maemo::Timed::service()))
-    log_info("service name '%s' registered on bus '%s'", Maemo::Timed::service(), conn_name.c_str()) ;
+  const string conn_name = Maemo::Autotzd::bus().name().toStdString() ;
+  if (Maemo::Autotzd::bus().registerService(Maemo::Autotzd::service()))
+    log_info("service name '%s' registered on bus '%s'", Maemo::Autotzd::service(), conn_name.c_str()) ;
   else
   {
-    const string msg = Maemo::Timed::bus().lastError().message().toStdString() ;
-    log_critical("can't register service '%s' on bus '%s': '%s'", Maemo::Timed::service(), conn_name.c_str(), msg.c_str()) ;
+    const string msg = Maemo::Autotzd::bus().lastError().message().toStdString() ;
+    log_critical("can't register service '%s' on bus '%s': '%s'", Maemo::Autotzd::service(), conn_name.c_str(), msg.c_str()) ;
     log_critical("aborting") ;
     ::exit(1) ;
   }
 }
-
-void Timed::init_cellular_services()
+*/
+void Autotzd::init_cellular_services()
 {
   tzdata::init(tz_by_default) ;
   csd = new csd_t(this) ;
@@ -285,18 +286,20 @@ void Timed::init_cellular_services()
 
 }
 
-Timed::~Timed()
+Autotzd::~Autotzd()
 {
-  stop_dbus() ;
+  //  stop_dbus() ;
   stop_stuff() ;
 }
-void Timed::stop_dbus()
+/*
+void Autotzd::stop_dbus()
 {
-  Maemo::Timed::bus().unregisterService(Maemo::Timed::service()) ;
+  Maemo::Autotzd::bus().unregisterService(Maemo::Autotzd::service()) ;
   QDBusConnection::disconnectFromBus(QDBusConnection::sessionBus().name());
   QDBusConnection::disconnectFromBus(QDBusConnection::systemBus().name()) ;
 }
-void Timed::stop_stuff()
+*/
+void Autotzd::stop_stuff()
 {
   delete settings ;
   log_debug() ;
@@ -308,18 +311,13 @@ void Timed::stop_stuff()
   log_notice("stop_stuff() DONE") ;
 }
 
-void Timed::system_owner_changed(const QString &name, const QString &oldowner, const QString &newowner)
-{
-  log_debug() ;
-}
-
 /*
  * xxx
  * These are the "stupid and simple" backup methods.
  * Just like the doctor ordered. :)
  * The chmod is a workaround for backup-framework crash bug.
  */
-void Timed::save_settings()
+void Autotzd::save_settings()
 {
   iodata::record *tree = settings->save() ;
   int res = settings_storage->save(tree) ;
@@ -334,7 +332,7 @@ void Timed::save_settings()
   delete tree ;
 }
 
-void Timed::invoke_signal(const nanotime_t &back)
+void Autotzd::invoke_signal(const nanotime_t &back)
 {
   log_debug("systime_back=%s, back=%s", systime_back.str().c_str(), back.str().c_str()) ;
   systime_back += back ;
@@ -347,7 +345,7 @@ void Timed::invoke_signal(const nanotime_t &back)
   method.invoke(this, Qt::QueuedConnection);
 }
 
-void Timed::unix_signal(int signo)
+void Autotzd::unix_signal(int signo)
 {
   switch(signo)
   {
@@ -398,24 +396,14 @@ void Timed::unix_signal(int signo)
   }
 }
 
-void Timed::update_oracle_context(bool s)
-{
-  log_debug("update_oracle_context(%d): NOT IMPLEMENTED", s);
-}
-
-void Timed::session_reported(const QString &new_address)
-{
-  (void)new_address ;
-}
-
-void Timed::init_kernel_notification()
+void Autotzd::init_kernel_notification()
 {
   notificator = new kernel_notification_t(this);
   QObject::connect(notificator, SIGNAL(system_time_changed(const nanotime_t &)), this, SLOT(kernel_notification(const nanotime_t &))) ;
   notificator->start() ;
 }
 
-void Timed::kernel_notification(const nanotime_t &jump_forwards)
+void Autotzd::kernel_notification(const nanotime_t &jump_forwards)
 {
   log_notice("KERNEL: system time changed by %s", jump_forwards.str().c_str()) ;
   settings->process_kernel_notification(jump_forwards) ;

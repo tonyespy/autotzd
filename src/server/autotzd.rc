@@ -1,3 +1,2 @@
-data_directory = ".timed",
-events_file = "events.data",
+data_directory = ".autotzd",
 settings_file = "settings.data" .

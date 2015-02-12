@@ -1,26 +1,27 @@
-/***************************************************************************
-**                                                                        **
-**  Copyright (C) 2013 Jolla Ltd.                                         **
-**  Contact: Petri M. Gerdt <petri.gerdt@jollamobile.com>                 **
-**                                                                        **
-**     This file is part of Timed                                         **
-**                                                                        **
-**     Timed is free software; you can redistribute it and/or modify      **
-**     it under the terms of the GNU Lesser General Public License        **
-**     version 2.1 as published by the Free Software Foundation.          **
-**                                                                        **
-**     Timed is distributed in the hope that it will be useful, but       **
-**     WITHOUT ANY WARRANTY;  without even the implied warranty  of       **
-**     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               **
-**     See the GNU Lesser General Public License  for more details.       **
-**                                                                        **
-**   You should have received a copy of the GNU  Lesser General Public    **
-**   License along with Timed. If not, see http://www.gnu.org/licenses/   **
-**                                                                        **
-***************************************************************************/
+/*
+ *  Autotzd - automatic timezone detection
+ *
+ *  This file was originally sourced from timed, see top-level
+ *  README file for more details.
+ *
+ *  Copyright (C) 2013 Jolla Ltd.
+ *
+ *  autotzd is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License
+ *  version 2.1 as published by the Free Software Foundation.
+ *
+ *  autotzd is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY;  without even the implied warranty  of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License  for more details.
+ *
+ *  You should have received a copy of the GNU  Lesser General Public
+ *  License along with autotzd. If not, see http://www.gnu.org/licenses/
+ *
+ */
 
-#ifndef NETWORKTIME_H
-#define NETWORKTIME_H
+#ifndef AUTOTZD_NETWORKTIME_H
+#define AUTOTZD_NETWORKTIME_H
 
 #include <QMap>
 #include <QObject>
@@ -32,7 +33,6 @@
 class QDBusPendingCallWatcher;
 class NetworkTimeWatcher;
 
-// See http://harmattan-dev.nokia.com/docs/platform-api-reference/xml/daily-docs/libcellular-qt/classCellular_1_1NetworkTime.html
 class NetworkTime : public QObject
 {
     Q_OBJECT
@@ -60,4 +60,4 @@ private slots:
     void networkTimeChanged(QVariantMap map);
     void networkTimeQueryCompletedSlot(QVariantMap map);
 };
-#endif // NETWORKTIME_H
+#endif /* AUTOTZD_NETWORKTIME_H */

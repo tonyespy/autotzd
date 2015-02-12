@@ -1,10 +1,10 @@
 [Unit]
-Description=Time Daemon
+Description=Auto Timezone Daemon
 Requires=dbus.socket
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/timed --systemd
+ExecStart=/usr/bin/autotzd --systemd
 Restart=always
 
 [Install]

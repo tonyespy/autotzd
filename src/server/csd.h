@@ -1,28 +1,28 @@
-/***************************************************************************
-**                                                                        **
-**   Copyright (C) 2009-2011 Nokia Corporation.                           **
-**                                                                        **
-**   Author: Ilya Dogolazky <ilya.dogolazky@nokia.com>                    **
-**   Author: Simo Piiroinen <simo.piiroinen@nokia.com>                    **
-**   Author: Victor Portnov <ext-victor.portnov@nokia.com>                **
-**                                                                        **
-**     This file is part of Timed                                         **
-**                                                                        **
-**     Timed is free software; you can redistribute it and/or modify      **
-**     it under the terms of the GNU Lesser General Public License        **
-**     version 2.1 as published by the Free Software Foundation.          **
-**                                                                        **
-**     Timed is distributed in the hope that it will be useful, but       **
-**     WITHOUT ANY WARRANTY;  without even the implied warranty  of       **
-**     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               **
-**     See the GNU Lesser General Public License  for more details.       **
-**                                                                        **
-**   You should have received a copy of the GNU  Lesser General Public    **
-**   License along with Timed. If not, see http://www.gnu.org/licenses/   **
-**                                                                        **
-***************************************************************************/
-#ifndef MAEMO_TIMED_CSD_H
-#define MAEMO_TIMED_CSD_H
+/*
+ *  Autotzd - automatic timezone detection
+ *
+ *  This file was originally sourced from timed, see top-level
+ *  README file for more details.
+ *
+ *  Copyright (C) 2009-2011 Nokia Corporation.
+ *  Copyright (C) 2015 Canonical, Inc.
+ *
+ *  autotzd is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License
+ *  version 2.1 as published by the Free Software Foundation.
+ *
+ *  autotzd is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY;  without even the implied warranty  of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License  for more details.
+ *
+ *  You should have received a copy of the GNU  Lesser General Public
+ *  License along with autotzd. If not, see http://www.gnu.org/licenses/
+ *
+ */
+
+#ifndef AUTOTZD_CSD_H
+#define AUTOTZD_CSD_H
 
 #include <string>
 
@@ -32,18 +32,18 @@
 #include "networkoperator.h"
 #include "networktimeinfo.h"
 
-#include "../lib/nanotime.h"
+#include "nanotime.h"
 
 #include "cellular.h"
 
-class Timed ;
+class Autotzd ;
 
 struct csd_t : public QObject
 {
   Q_OBJECT ;
   static const nanotime_t old_nitz_threshold ;
   static const int operator_wait_ms = 1000 ;
-  Timed *timed ;
+  Autotzd *autotzd ;
   NetworkTime *nt ;
   NetworkOperator *op ;
   Q_INVOKABLE void csd_operator_q() ;
@@ -69,8 +69,9 @@ private:
   void output_csd_network_time_info() ;
 
 public:
-  csd_t(Timed *owner) ;
+  csd_t(Autotzd *owner) ;
   static std::string csd_network_time_info_to_string(const NetworkTimeInfo &nti) ;
   virtual ~csd_t() ;
 } ;
-#endif//MAEMO_TIMED_CSD_H
+
+#endif /* AUTOTZD_CSD_H */
