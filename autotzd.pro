@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 CONFIG += ordered
 #SUBDIRS += src tests tools
-#SUBDIRS += src
+SUBDIRS += src
 OTHER_FILES += rpm/*.spec rpm/*.yaml

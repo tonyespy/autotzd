@@ -5,12 +5,7 @@ TEMPLATE = app
 
 TARGET = autotzd
 
-VERSION = $$(TIMED_VERSION)
-
 INCLUDEPATH += ../h
-
-#QMAKE_LIBDIR_FLAGS += -L../lib
-#LIBS += -ltimed
 
 IODATA_TYPES = config.type settings.type customization.type tzdata.type
 
@@ -75,7 +70,7 @@ autotzrc.path  = $$(DESTDIR)/etc
 dbusconf.path  = $$(DESTDIR)/etc/dbus-1/system.d
 systemd.path = $$(DESTDIR)/usr/lib/systemd/user
 
-INSTALLS += target backupconf backupscripts cud rfs timedrc dbusconf systemd
+INSTALLS += target dbusconf systemd
 
 QMAKE_CXXFLAGS  += -Wall
 

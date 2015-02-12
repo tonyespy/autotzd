@@ -8,3 +8,45 @@ export QT_SELECT=qt5
 
 %:
 	dh  $@
+
+clean:
+	echo TARGET clean
+	dh_testdir
+	dh_testroot
+	dh_auto_clean
+	find src -name Makefile | xargs rm -f
+	dh_clean
+
+build:
+	echo TARGET build
+	dh_testdir
+	dh_prep
+	cd src && qmake -unix -recursive
+
+install: build
+	echo TARGET install
+	dh_testdir
+	dh_installdirs
+	cd src && make install INSTALL_ROOT=$(CURDIR)/debian/tmp
+
+binary: binary-indep binary-arch
+binary-indep:
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_install --sourcedir=$(CURDIR)/debian/tmp
+	dh_strip -v --package=autotzd || exit 1 ;
+	dh_installman
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_makeshlibs
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+
+

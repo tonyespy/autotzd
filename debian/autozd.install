@@ -1,8 +1,0 @@
-# the old: usr/bin/timed
-usr/bin/timed
-
-# compiled in, don't install
-# usr/share/timed/typeinfo
-
-# config file
-etc/timed.rc
