@@ -1,9 +1,9 @@
 This README describes the upstream rilmodem/ofono git repository hosted on
 github:
 
-https://github.com/rilmodem/autotz
+https://github.com/rilmodem/autotzd
 
-autotz is a fork of timed, a daemon originally created as part of Nokia's
+autotzd is a fork of timed, a daemon originally created as part of Nokia's
 MAEMO project, and used as part of Moblin, MeegGo, and currently Sailfish
 OS.
 
