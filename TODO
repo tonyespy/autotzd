@@ -1,22 +1,17 @@
 This file is used to track remaining work items for autotzd.
 
-1. Fix debian/rules
-2. Fix lintian errors reported dh_builddeb
-   - install copyright file to /usr/share/doc/autotz/
-3. Add simple DBus API which exposes settings as properties
-4. Add new DBus policy configuration
-5. Integrate with systemd-timedated to allow autotz to update
-the system timezone and clock.
-6. [Optional] re-format code to introduce whitespace
-7. [Optional] update C++ usage ( see more effective C++ )
-8. evalutate /tests
-9. add unit tests
-10. add client script(s)
-11. get rid of #if DEADCODE...
-12. checkout BSD_SOURCE!
-13. cleanup .rc file, other misc files?
-
-** CHECK that copyrights headers are correct **
-
-13. get rid of customizations?
-14. get rid of suggestion_t
+ * Fix lintian errors reported dh_builddeb
+   * install copyright file to /usr/share/doc/autotz/
+ * Add simple DBus API which exposes settings as properties
+ * Add new DBus policy configuration
+ * Integrate with systemd-timedated to allow autotz to update
+   the system timezone and clock.
+ * [Optional] re-format code to introduce whitespace
+   * [Optional] add styleguide
+ * [Optional] update C++ usage ( see more effective C++ )
+ * Add unit tests
+ * Add client script(s)
+ * Get rid of #if DEADCODE...
+ * checkout usage of #define BSD_SOURCE!
+ * cleanup .rc file, other misc files?
+ * get rid of suggestion_t

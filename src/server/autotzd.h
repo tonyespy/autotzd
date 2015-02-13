@@ -45,7 +45,6 @@ struct Autotzd : public QCoreApplication
 {
 public:
   inline const char *configuration_path() { return  "/etc/autotzd.rc" ; }
-  inline const char *customization_path() { return  "/usr/share/autotzd/customization.data" ; } // TODO: make it configurable
 
 private:
 
@@ -68,7 +67,7 @@ private:
   // init_* methods, to be called by constructor only
   void init_unix_signal_handler() ;
   void init_configuration() ;
-  void init_customization() ;
+  void init_default_properties() ;
   void init_read_settings() ;
   //  void init_main_interface_object() ;
   //  void init_main_interface_dbus_name() ;

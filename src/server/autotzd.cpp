@@ -35,7 +35,6 @@
 #include <QDir>
 
 #include "config.type.h"
-#include "customization.type.h"
 #include "settings.type.h"
 
 #include "adaptor.h"
@@ -53,6 +52,8 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+
+#define DEFAULT_TZONE "Europe/Helsinki"
 
 static void spam()
 {
@@ -99,7 +100,7 @@ Autotzd::Autotzd(int ac, char **av) :
   init_configuration() ;
   log_debug() ;
 
-  init_customization() ;
+  init_default_properties() ;
   log_debug() ;
 
   init_read_settings() ;
@@ -178,39 +179,16 @@ static bool parse_boolean(const string &str)
   return str == "true" || str == "True" || str == "1" ;
 }
 
-// * read customization data provided by customization package
-void Autotzd::init_customization()
+void Autotzd::init_default_properties()
 {
-  iodata::storage *storage = new iodata::storage ;
-  storage->set_primary_path(customization_path()) ;
-  storage->set_validator(customization_data_validator(), "customization_t") ;
-
-  iodata::record *c = storage->load() ;
-  log_assert(c, "loading customization settings failed") ;
-
-  if(storage->source()==0)
-    log_info("customization loaded from '%s'", customization_path()) ;
-  else
-    log_warning("customization file '%s' corrupted or non-existing, using default values", customization_path()) ;
-
-  format24_by_default = parse_boolean(c->get("format24")->str()) ;
-  nitz_supported = parse_boolean(c->get("useNitz")->str()) ;
-  auto_time_by_default = parse_boolean(c->get("autoTime")->str()) ;
-  guess_tz_by_default = parse_boolean(c->get("guessTz")->str()) ;
-  tz_by_default = c->get("tz")->str() ;
-
-  if (not nitz_supported and auto_time_by_default)
-  {
-    log_warning("automatic time update disabled because nitz is not supported in the device") ;
-    auto_time_by_default = false ;
-  }
-
-  delete c ;
-  delete storage ;
+  format24_by_default = true;
+  nitz_supported = true;
+  auto_time_by_default = true;
+  guess_tz_by_default = true;
+  tz_by_default = DEFAULT_TZONE;
 }
 
 // * read settings
-// * apply customization defaults, if needed
 void Autotzd::init_read_settings()
 {
   settings_storage = new iodata::storage ;
@@ -220,6 +198,8 @@ void Autotzd::init_read_settings()
   iodata::record *tree = settings_storage->load() ;
 
   log_assert(tree, "loading settings failed") ;
+
+  /* TODO(AWE): get rid of this once settings works again */
 
 #define apply_cust(key, val)  do { if (tree->get(key)->value() < 0) tree->add(key, val) ; } while(false)
   apply_cust("format_24", format24_by_default) ;

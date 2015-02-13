@@ -7,7 +7,7 @@ TARGET = autotzd
 
 INCLUDEPATH += ../h
 
-IODATA_TYPES = config.type settings.type customization.type tzdata.type
+IODATA_TYPES = config.type settings.type tzdata.type
 
 HEADERS += settings.h \
     csd.h \
@@ -58,7 +58,7 @@ CONFIG += iodata
 
 target.path = $$(DESTDIR)/usr/bin
 
-# typeinfo.files = queue.type config.type settings.type customization.type tzdata.type timed-cust-rc.type
+# typeinfo.files = queue.type config.type settings.type tzdata.type timed-cust-rc.type
 # typeinfo.path = $$(DESTDIR)/usr/share/timed/typeinfo
 
 autotzd.files = timed-qt5.rc
