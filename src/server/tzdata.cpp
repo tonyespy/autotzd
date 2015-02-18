@@ -5,7 +5,7 @@
  *  README file for more details.
  *
  *  Copyright (C) 2009-2011 Nokia Corporation.
- *  Copyright (C) 2015 Canonical, Inc.
+ *  Copyright (C) 2015 Canonical Ltd.
  *
  *  autotzd is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License
@@ -180,6 +180,8 @@ void tzdata::init(const string &default_tz)
     mcc_to_xy[mcc] = xy ;
   }
 
+  log_debug("initialized mcc_to_xy") ;
+
   const iodata::array *b = B->get("list")->arr() ; // TODO: rename list->tz_single (here and in tzdata script)
   for(unsigned i=0; i<b->size(); ++i)
   {
@@ -195,6 +197,8 @@ void tzdata::init(const string &default_tz)
     string tz = b->get(i)->get("tz")->str() ;
     process_zone(xy, tz, 0) ; // 0 is 'capital'
   }
+
+  log_debug("initialized single") ;
 
   const iodata::array *c = C->get("xy_to_tz")->arr() ;
   for(unsigned i=0; i<c->size(); ++i)

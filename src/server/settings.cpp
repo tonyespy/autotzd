@@ -5,7 +5,7 @@
  *  README file for more details.
  *
  *  Copyright (C) 2009-2011 Nokia Corporation.
- *  Copyright (C) 2015 Canonical, Inc.
+ *  Copyright (C) 2015 Canonical Ltd.
  *
  *  autotzd is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License
