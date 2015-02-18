@@ -198,14 +198,6 @@ nanotime_t source_settings::value_at_zero() const
     return manual_utc->value_at_zero() ;
 }
 
-void source_settings::process_kernel_notification(const nanotime_t &jump_forwards)
-{
-  o->invoke_signal(-jump_forwards) ;
-
-  // Make time valid
-  //  o->open_epoch() ;
-}
-
 void source_settings::cellular_time_slot(const cellular_time_t &T)
 {
   nanotime_t time_at_zero = nanotime_t(T.value) - T.ts ;

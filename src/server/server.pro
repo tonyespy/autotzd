@@ -54,9 +54,6 @@ SOURCES += tzdata.cpp \
 SOURCES += olson.cpp tz.cpp
 HEADERS += tz.h
 
-SOURCES += notification.cpp
-HEADERS += notification.h
-
 CONFIG += link_pkgconfig
 #PKGCONFIG += libpcrecpp libsystemd-daemon
 

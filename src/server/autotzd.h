@@ -39,7 +39,6 @@
 #include "olson.h"
 #include "tz.h"
 #include "csd.h"
-#include "notification.h"
 #include "timedatewatcher.h"
 
 struct Autotzd : public QCoreApplication
@@ -75,7 +74,6 @@ private:
   //  void init_main_interface_dbus_name() ;
   void init_timedate_service() ;
   void init_cellular_services() ;
-  void init_kernel_notification() ;
 
 public:
   void stop_stuff() ;
@@ -109,12 +107,10 @@ private:
   tz_oracle_t *tz_oracle ;
 
 public:
-  kernel_notification_t *notificator ;
   void invoke_signal(const nanotime_t &) ;
   void invoke_signal() { nanotime_t zero=0 ; invoke_signal(zero) ; }
 private Q_SLOTS:
   void unix_signal(int signo) ;
-  void kernel_notification(const nanotime_t &jump_forwards) ;
 private:
   UnixSignal *signal_object ;
 public:

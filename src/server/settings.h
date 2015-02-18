@@ -159,8 +159,6 @@ struct source_settings : public QObject
   void load(const iodata::record *, const string &defult_tz) ;
   iodata::record *save() const ;
 
-  void process_kernel_notification(const nanotime_t &jump_forwards) ;
-
   Q_OBJECT ;
 public Q_SLOTS:
   void cellular_time_slot(const cellular_time_t &T) ;

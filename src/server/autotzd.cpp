@@ -43,7 +43,6 @@
 #include "tz.h"
 #include "tzdata.h"
 #include "csd.h"
-#include "notification.h"
 #include "time.h"
 #include "../common/log.h"
 
@@ -111,9 +110,6 @@ Autotzd::Autotzd(int ac, char **av) :
 
   //  init_main_interface_dbus_name() ;
   //  log_debug() ;
-
-  init_kernel_notification();
-  log_debug() ;
 
   // TODO: make autotzd wait for timedate
   // to grab TZ, before continuing.
@@ -385,17 +381,4 @@ void Autotzd::unix_signal(int signo)
       quit() ;
       break ;
   }
-}
-
-void Autotzd::init_kernel_notification()
-{
-  notificator = new kernel_notification_t(this);
-  QObject::connect(notificator, SIGNAL(system_time_changed(const nanotime_t &)), this, SLOT(kernel_notification(const nanotime_t &))) ;
-  notificator->start() ;
-}
-
-void Autotzd::kernel_notification(const nanotime_t &jump_forwards)
-{
-  log_notice("KERNEL: system time changed by %s", jump_forwards.str().c_str()) ;
-  settings->process_kernel_notification(jump_forwards) ;
 }
