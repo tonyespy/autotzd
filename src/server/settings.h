@@ -5,7 +5,7 @@
  *  README file for more details.
  *
  *  Copyright (C) 2009-2011 Nokia Corporation.
- *  Copyright (C) 2015 Canonical, Inc.
+ *  Copyright (C) 2015 Canonical Ltd.
  *
  *  autotzd is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License
@@ -134,13 +134,6 @@ struct key_int_t : public source_t
   iodata::item *save() const ;
   void load(const iodata::item *) ;
 } ;
-
-struct app_snooze_t : public key_int_t
-{
-  virtual ~app_snooze_t() { }
-  const char *name() const { return "app_snooze" ; }
-};
-
 
 struct source_settings : public QObject
 {
