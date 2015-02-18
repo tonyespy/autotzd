@@ -33,7 +33,6 @@
 #include <iodata/storage.h>
 
 #include "wrappers.h"
-#include "settings.h"
 #include "unix-signal.h"
 #include "onitz.h"
 #include "olson.h"
@@ -69,7 +68,6 @@ private:
   void init_unix_signal_handler() ;
   void init_configuration() ;
   void init_default_properties() ;
-  void init_read_settings() ;
   //  void init_main_interface_object() ;
   //  void init_main_interface_dbus_name() ;
   void init_timedate_service() ;
@@ -78,7 +76,6 @@ private:
 public:
   void stop_stuff() ;
   void stop_dbus() ;
-  source_settings *settings ;
   cellular_handler *nitz_object ;
   csd_t *csd ;
 
@@ -92,7 +89,6 @@ public:
   int get_default_gmt_offset() { return default_gmt_offset ; }
 
 private:
-  iodata::storage *event_storage, *settings_storage ;
 
   unsigned threshold_period_long, threshold_period_short ;
   QString data_path, events_path, settings_path;
@@ -109,6 +105,9 @@ private:
 public:
   void invoke_signal(const nanotime_t &) ;
   void invoke_signal() { nanotime_t zero=0 ; invoke_signal(zero) ; }
+public Q_SLOTS:
+  void cellular_time_slot(const cellular_time_t &T) ;
+  void cellular_zone_slot(olson *tz, suggestion_t s, bool sure) ;
 private Q_SLOTS:
   void unix_signal(int signo) ;
 private:

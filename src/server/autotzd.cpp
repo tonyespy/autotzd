@@ -35,11 +35,9 @@
 #include <QDir>
 
 #include "config.type.h"
-#include "settings.type.h"
 
 #include "adaptor.h"
 #include "autotzd.h"
-#include "settings.h"
 #include "tz.h"
 #include "tzdata.h"
 #include "csd.h"
@@ -100,9 +98,6 @@ Autotzd::Autotzd(int ac, char **av) :
   log_debug() ;
 
   init_default_properties() ;
-  log_debug() ;
-
-  init_read_settings() ;
   log_debug() ;
 
   //  init_main_interface_object() ;
@@ -189,30 +184,6 @@ void Autotzd::init_default_properties()
   tz_by_default = DEFAULT_TZONE;
 }
 
-// * read settings
-void Autotzd::init_read_settings()
-{
-  settings_storage = new iodata::storage ;
-  settings_storage->set_primary_path(settings_path.toStdString());
-  settings_storage->set_secondary_path(settings_path.toStdString() + ".bak");
-  settings_storage->set_validator(settings_data_validator(), "settings_t") ;
-  iodata::record *tree = settings_storage->load() ;
-
-  log_assert(tree, "loading settings failed") ;
-
-  /* TODO(AWE): get rid of this once settings works again */
-
-#define apply_cust(key, val)  do { if (tree->get(key)->value() < 0) tree->add(key, val) ; } while(false)
-  apply_cust("format_24", format24_by_default) ;
-  apply_cust("time_nitz", auto_time_by_default) ;
-  apply_cust("local_cellular", guess_tz_by_default) ;
-#undef apply_cust
-
-  settings = new source_settings(this) ; // TODO: use tz_by_default here
-  settings->load(tree, tz_by_default) ;
-
-  delete tree ;
-}
 /*
 void Autotzd::init_main_interface_object()
 {
@@ -261,10 +232,10 @@ void Autotzd::init_cellular_services()
   csd = new csd_t(this) ;
   tz_oracle = new tz_oracle_t ;
 
-  bool res1 = QObject::connect(csd, SIGNAL(csd_cellular_time(const cellular_time_t &)), settings, SLOT(cellular_time_slot(const cellular_time_t &)));
+  bool res1 = QObject::connect(csd, SIGNAL(csd_cellular_time(const cellular_time_t &)), this, SLOT(cellular_time_slot(const cellular_time_t &)));
   bool res2 = QObject::connect(csd, SIGNAL(csd_cellular_offset(const cellular_offset_t &)), tz_oracle, SLOT(cellular_offset(const cellular_offset_t &)));
   bool res3 = QObject::connect(csd, SIGNAL(csd_cellular_operator(const cellular_operator_t &)), tz_oracle, SLOT(cellular_operator(const cellular_operator_t &)));
-  bool res4 = QObject::connect(tz_oracle, SIGNAL(cellular_zone_detected(olson *, suggestion_t, bool)), settings, SLOT(cellular_zone_slot(olson *, suggestion_t, bool)));
+  bool res4 = QObject::connect(tz_oracle, SIGNAL(cellular_zone_detected(olson *, suggestion_t, bool)), this, SLOT(cellular_zone_slot(olson *, suggestion_t, bool)));
 
   log_assert(res1) ;
   log_assert(res2) ;
@@ -288,35 +259,11 @@ void Autotzd::stop_dbus()
 */
 void Autotzd::stop_stuff()
 {
-  delete settings ;
-  log_debug() ;
-  delete settings_storage ;
   log_debug() ;
   delete tz_oracle ;
   log_debug() ;
   cellular_handler::uninitialize() ;
   log_notice("stop_stuff() DONE") ;
-}
-
-/*
- * xxx
- * These are the "stupid and simple" backup methods.
- * Just like the doctor ordered. :)
- * The chmod is a workaround for backup-framework crash bug.
- */
-void Autotzd::save_settings()
-{
-  iodata::record *tree = settings->save() ;
-  int res = settings_storage->save(tree) ;
-
-  if(res==0) // primary file
-    log_info("wall clock settings written") ;
-  else if(res==1)
-    log_warning("wall clock settings written to secondary file") ;
-  else
-    log_critical("wall clock settings can't be saved") ;
-
-  delete tree ;
 }
 
 void Autotzd::invoke_signal(const nanotime_t &back)
@@ -381,4 +328,16 @@ void Autotzd::unix_signal(int signo)
       quit() ;
       break ;
   }
+}
+
+void Autotzd::cellular_time_slot(const cellular_time_t &T)
+{
+  nanotime_t time_at_zero = nanotime_t(T.value) - T.ts ;
+  log_debug("time_at_zero=%s, (T=%s)", time_at_zero.str().c_str(), T.str().c_str()) ;
+}
+
+void Autotzd::cellular_zone_slot(olson *tz, suggestion_t s, bool sure)
+{
+  (void) sure ;
+  log_debug("time zone '%s' magicaly detected", tz->name().c_str()) ;
 }

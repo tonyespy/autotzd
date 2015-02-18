@@ -7,10 +7,9 @@ TARGET = autotzd
 
 INCLUDEPATH += ../h
 
-IODATA_TYPES = config.type settings.type tzdata.type
+IODATA_TYPES = config.type tzdata.type
 
-HEADERS += settings.h \
-    csd.h \
+HEADERS += csd.h \
     adaptor.h \
     autotzd.h \
     unix-signal.h \
@@ -35,7 +34,6 @@ SOURCES += tzdata.cpp \
     autotzd.cpp \
     timeutil.cpp \
     misc.cpp \
-    settings.cpp \
     unix-signal.cpp \
     onitz.cpp \
     nanotime.cpp \
@@ -60,9 +58,6 @@ CONFIG += link_pkgconfig
 CONFIG += iodata
 
 target.path = $$(DESTDIR)/usr/bin
-
-# typeinfo.files = queue.type config.type settings.type tzdata.type timed-cust-rc.type
-# typeinfo.path = $$(DESTDIR)/usr/share/timed/typeinfo
 
 autotzd.files = timed-qt5.rc
 dbusconf.files = timed-qt5.conf
