@@ -115,8 +115,13 @@ Autotzd::Autotzd(int ac, char **av) :
   init_kernel_notification();
   log_debug() ;
 
-  init_cellular_services() ;
+  // TODO: make autotzd wait for timedate
+  // to grab TZ, before continuing.
 
+  init_timedate_service() ;
+  log_debug() ;
+
+  init_cellular_services() ;
   log_info("daemon is up and running") ;
 
   /*
@@ -248,6 +253,12 @@ void Autotzd::init_main_interface_dbus_name()
   }
 }
 */
+
+void Autotzd::init_timedate_service()
+{
+  td_watcher = new TimedateWatcher ;
+}
+
 void Autotzd::init_cellular_services()
 {
   tzdata::init(tz_by_default) ;

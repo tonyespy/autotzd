@@ -40,6 +40,7 @@
 #include "tz.h"
 #include "csd.h"
 #include "notification.h"
+#include "timedatewatcher.h"
 
 struct Autotzd : public QCoreApplication
 {
@@ -55,6 +56,7 @@ private:
   bool nitz_supported ;
   string tz_by_default ;
   bool first_boot_date_adjusted;
+  TimedateWatcher *td_watcher;
 
 public:
   bool is_nitz_supported() { return nitz_supported ; }
@@ -71,6 +73,7 @@ private:
   void init_read_settings() ;
   //  void init_main_interface_object() ;
   //  void init_main_interface_dbus_name() ;
+  void init_timedate_service() ;
   void init_cellular_services() ;
   void init_kernel_notification() ;
 

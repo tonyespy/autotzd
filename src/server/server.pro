@@ -23,7 +23,10 @@ HEADERS += settings.h \
     networktimeinfo.h \
     ofonomodemmanager.h \
     modemwatcher.h \
-    ofonoconstants.h
+    ofonoconstants.h \
+    dbusconstants.h \
+    timedateconstants.h \
+    timedatewatcher.h
 
 SOURCES += tzdata.cpp \
     cellular.cpp \
@@ -43,7 +46,10 @@ SOURCES += tzdata.cpp \
     networktimeinfo.cpp \
     ofonomodemmanager.cpp \
     modemwatcher.cpp \
-    ofonoconstants.cpp
+    ofonoconstants.cpp \
+    dbusconstants.cpp \
+    timedateconstants.cpp \
+    timedatewatcher.cpp
 
 SOURCES += olson.cpp tz.cpp
 HEADERS += tz.h
