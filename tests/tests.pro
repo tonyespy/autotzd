@@ -1,9 +1,8 @@
-equals(QT_MAJOR_VERSION, 4): PACKAGENAME = timed
-equals(QT_MAJOR_VERSION, 5): PACKAGENAME = timed-qt5
+PACKAGENAME = timed
 
 TEMPLATE = subdirs
 
-SUBDIRS = ut_networktime tst_events
+SUBDIRS = ut_networktime
 
 tests_xml.target = tests.xml
 tests_xml.depends = $$PWD/tests.xml.in
