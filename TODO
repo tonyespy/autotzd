@@ -11,7 +11,11 @@ This file is used to track remaining work items for autotzd.
  * [Optional] update C++ usage ( see more effective C++ )
  * Add unit tests
  * Add client script(s)
- * Get rid of #if DEADCODE...
  * checkout usage of #define BSD_SOURCE!
  * cleanup .rc file, other misc files?
  * get rid of suggestion_t
+ * make use of whitespace consisent
+   eg. "foo() ;" vs. "foo();"
+ * get rid of duplicate #include stmts between headers & impls
+ * fix logging ( ie. use syslog, or autotz-specific log file )
+ * cleanup configuration file logic
