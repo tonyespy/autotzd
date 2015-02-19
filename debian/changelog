@@ -1,5 +1,5 @@
-autotzd (0.01~awe1) vivid; urgency=medium
+autotzd (0.01) vivid; urgency=medium
 
-  * Build: updated debian packaging
+  * Inital version
 
- -- Tony Espy <espy@canonical.com>  Mon, 02 Feb 2015 19:46:15 -0500
+ -- Tony Espy <espy@canonical.com>  Wed, 18 Feb 2015 20:36:15 -0500
