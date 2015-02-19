@@ -39,33 +39,6 @@ using namespace std ;
 
 #include "tzdata.h"
 
-#if DEADCODE
-struct tz_single_t ;
-struct tz_distinct_t ;
-
-struct tz_distinct_t
-{
-  olson * guess_timezone(int mcc, tz_suggestions_t &list) ;
-  tz_distinct_t(const iodata::record *) ;
-  map<int, vector<olson*> > mcc_to_tzlist ;
-} ;
-
-struct tz_single_t
-{
-  olson * guess_timezone(int mcc) ;
-  tz_single_t(const iodata::record *) ;
-  map<int, string> mcc_to_tz ;
-} ;
-
-
-string mcc_to_xy(int mcc) ; // maps mcc to country code (2 chars)
-map<string, vector<string> > xy_to_tz ; // time zones by country code
-iodata::validator *validator() ;
-iodata::record *open_database(const char *path, const char *type) ;
-void read_timezones_by_country() ;
-
-#endif
-
 // we need some some data structures...
 
 // 1. Mapping mcc to alpha-2 code: 310=>US
