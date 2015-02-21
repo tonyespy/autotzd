@@ -1,11 +1,12 @@
 This file is used to track remaining work items for autotzd.
 
- * Fix lintian errors reported dh_builddeb
-   * install copyright file to /usr/share/doc/autotz/
+ * Add logic which checks new timezones against the existing
+   timezone to prevent spurious DBus requests.
  * Add simple DBus API which exposes settings as properties
+   ( may not be needed )
  * Add new DBus policy configuration
- * Integrate with systemd-timedated to allow autotz to update
-   the system timezone and clock.
+ * [Optional] Integrate with systemd-timedated to allow autotz to update
+   the system clock.
  * [Optional] re-format code to introduce whitespace
    * [Optional] add styleguide
  * [Optional] update C++ usage ( see more effective C++ )
@@ -14,8 +15,6 @@ This file is used to track remaining work items for autotzd.
  * checkout usage of #define BSD_SOURCE!
  * cleanup .rc file, other misc files?
  * get rid of suggestion_t
- * make use of whitespace consisent
-   eg. "foo() ;" vs. "foo();"
  * get rid of duplicate #include stmts between headers & impls
  * fix logging ( ie. use syslog, or autotz-specific log file )
  * cleanup configuration file logic
