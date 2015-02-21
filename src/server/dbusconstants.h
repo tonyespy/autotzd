@@ -26,6 +26,9 @@ class DbusConstants
 {
 public:
     static const char *DBUS_PROPS_INTERFACE;
+    static const char *DBUS_PROPS_CHANGED_SIGNAL;
+    static const char *DBUS_PROPS_GET_METHOD;
+    static const char *DBUS_PROPS_GETALL_METHOD;
 };
 
 #endif /* AUTOTZD_DBUSCONSTANTS_H */

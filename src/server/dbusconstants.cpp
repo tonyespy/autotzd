@@ -23,3 +23,6 @@
 #include "dbusconstants.h"
 
 const char *DbusConstants::DBUS_PROPS_INTERFACE = "org.freedesktop.DBus.Properties";
+const char *DbusConstants::DBUS_PROPS_GET_METHOD = "Get";
+const char *DbusConstants::DBUS_PROPS_GETALL_METHOD = "GetAll";
+const char *DbusConstants::DBUS_PROPS_CHANGED_SIGNAL = "PropertiesChanged";
