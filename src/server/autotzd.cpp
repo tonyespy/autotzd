@@ -223,7 +223,10 @@ void Autotzd::init_main_interface_dbus_name()
 
 void Autotzd::init_timedate_service()
 {
-  td_watcher = new TimedateWatcher ;
+  td_watcher = new TimedateWatcher;
+
+  bool res1 = QObject::connect(this, SIGNAL(new_timezone_slot(const std::string &)), td_watcher, SLOT(new_timezone_slot(const std::string &)));
+  log_assert(res1);
 }
 
 void Autotzd::init_cellular_services()
@@ -340,4 +343,10 @@ void Autotzd::cellular_zone_slot(olson *tz, suggestion_t s, bool sure)
 {
   (void) sure ;
   log_debug("time zone '%s' magicaly detected", tz->name().c_str()) ;
+
+  // AWE: the old code never checked the new zone against the previous
+  // zone.  Probably need to add a string to contain the last timezone
+  // name as an autotzd member.
+
+  emit new_timezone_slot(tz->name());
 }

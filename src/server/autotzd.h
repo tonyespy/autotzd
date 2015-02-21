@@ -105,6 +105,10 @@ private:
 public:
   void invoke_signal(const nanotime_t &) ;
   void invoke_signal() { nanotime_t zero=0 ; invoke_signal(zero) ; }
+
+signals:
+    void new_timezone_slot(const std::string &timezone);
+
 public Q_SLOTS:
   void cellular_time_slot(const cellular_time_t &T) ;
   void cellular_zone_slot(olson *tz, suggestion_t s, bool sure) ;

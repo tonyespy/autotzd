@@ -38,7 +38,10 @@ public:
     explicit TimedateWatcher(QObject *parent = 0);
     ~TimedateWatcher();
 
+public Q_SLOTS:
+    void new_timezone_slot(const std::string &timezone);
+
 private slots:
-    void onTimedatePropertiesChanged(QString objectPath, QDBusVariant value);
+    void onTimedatePropertiesChanged(QString objectPath, QDBusVariant value, QStringList invalidProps);
 };
 #endif /* AUTOTZD_TIMEDATEWATCHER_H */
