@@ -27,3 +27,4 @@
 const char *TimedateConstants::TIMEDATE_SERVICE = "org.freedesktop.timedate1";
 const char *TimedateConstants::TIMEDATE_INTERFACE = "org.freedesktop.timedate1";
 const char *TimedateConstants::TIMEDATE_PATH = "/org/freedesktop/timedate1";
+const char *TimedateConstants::TIMEDATE_SET_TZ_METHOD = "SetTimezone";

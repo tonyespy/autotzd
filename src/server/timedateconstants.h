@@ -29,6 +29,7 @@ public:
     static const char *TIMEDATE_SERVICE;
     static const char *TIMEDATE_INTERFACE;
     static const char *TIMEDATE_PATH;
+    static const char *TIMEDATE_SET_TZ_METHOD;
 };
 
 #endif /* AUTOTZD_TIMEDATECONSTANTS_H */
